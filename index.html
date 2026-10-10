@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>استوديو باسم للأنميشن | Basim Animation Studio</title>
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
     // --- نظام إدارة المشاريع لباسم ---
     let currentProjectName = "مشروع بدون عنوان";
     let currentProjectId = "proj_" + Date.now();
@@ -390,46 +391,48 @@
             </div>
 
             <!-- Playback & Export Controls -->
-            <div class="flex items-center justify-between gap-1.5 pt-1 border-t border-slate-800/70">
-                <div class="flex items-center gap-1.5">
-                    <!-- Play / Pause -->
-                    <button id="btnPlay" onclick="togglePlayback()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition">
-                        <i id="playIcon" class="fa-solid fa-play text-xs"></i>
-                        <span id="playLabel">تشغيل</span>
-                    </button>
-                    <!-- Prev Frame -->
-                    <button onclick="stepFrame(-1)" class="w-8 h-8 rounded-xl bg-studio-800 hover:bg-studio-700 active:scale-95 text-slate-300 border border-slate-700/60 flex items-center justify-center transition">
-                        <i class="fa-solid fa-backward-step text-xs"></i>
-                    </button>
-                    <!-- Next Frame -->
-                    <button onclick="stepFrame(1)" class="w-8 h-8 rounded-xl bg-studio-800 hover:bg-studio-700 active:scale-95 text-slate-300 border border-slate-700/60 flex items-center justify-center transition">
-                        <i class="fa-solid fa-forward-step text-xs"></i>
-                    </button>
+            <div class="flex flex-col gap-2 pt-2 border-t border-slate-800/70">
+                <!-- السطر الأول: أزرار التشغيل والسرعة -->
+                <div class="flex items-center justify-between gap-1.5">
+                    <div class="flex items-center gap-1.5">
+                        <button id="btnPlay" onclick="togglePlayback()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition">
+                            <i id="playIcon" class="fa-solid fa-play text-xs"></i>
+                            <span id="playLabel">تشغيل</span>
+                        </button>
+                        <button onclick="stepFrame(-1)" class="w-8 h-8 rounded-xl bg-studio-800 hover:bg-studio-700 active:scale-95 text-slate-300 border border-slate-700/60 flex items-center justify-center transition">
+                            <i class="fa-solid fa-backward-step text-xs"></i>
+                        </button>
+                        <button onclick="stepFrame(1)" class="w-8 h-8 rounded-xl bg-studio-800 hover:bg-studio-700 active:scale-95 text-slate-300 border border-slate-700/60 flex items-center justify-center transition">
+                            <i class="fa-solid fa-forward-step text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- FPS Speed control -->
+                    <div class="flex items-center gap-1.5 bg-studio-950 px-2.5 py-1 rounded-xl border border-slate-800 text-xs text-slate-400">
+                        <span class="font-bold text-[11px] text-slate-300"><span id="fpsNum">6</span> FPS</span>
+                        <input type="range" id="fpsRange" min="1" max="18" value="6" oninput="updateFPS(this.value)" class="w-16 accent-emerald-500 cursor-pointer">
+                    </div>
                 </div>
 
-                <!-- FPS Speed control -->
-                <div class="flex items-center gap-1 text-xs text-slate-400">
-                    <span class="font-bold text-[11px] text-slate-300"><span id="fpsNum">6</span> FPS</span>
-                    <input type="range" id="fpsRange" min="1" max="18" value="6" oninput="updateFPS(this.value)" class="w-14 accent-emerald-500 cursor-pointer">
+                <!-- السطر الثاني: أزرار التصدير والمشاريع -->
+                <div class="flex items-center justify-between gap-1.5">
+                    <button onclick="exportAnimationGif()" class="flex-1 py-1.5 bg-gradient-to-r from-amber-500 to-rose-500 hover:opacity-90 active:scale-95 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1 shadow-md shadow-amber-500/20 transition">
+                        <i class="fa-solid fa-download text-xs"></i>
+                        <span>تصدير GIF</span>
+                    </button>
+                    <button onclick="saveCurrentProject()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 transition shadow-md shadow-emerald-600/20" title="حفظ الرسمة الحالية">
+                        <i class="fa-solid fa-floppy-disk text-xs"></i>
+                        <span>حفظ</span>
+                    </button>
+                    <button onclick="openProjectsModal()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 transition shadow-md shadow-indigo-600/20" title="معرض مشاريع باسم">
+                        <i class="fa-solid fa-folder-open text-xs"></i>
+                        <span>مشاريعي</span>
+                    </button>
+                    <button onclick="createNewProject()" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 active:scale-95 text-slate-200 rounded-xl text-xs font-black flex items-center gap-1 transition" title="رسمة جديدة فارغة">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>جديد</span>
+                    </button>
                 </div>
-
-                <!-- Export GIF button -->
-                <button onclick="exportAnimationGif()" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-rose-500 hover:opacity-90 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-md shadow-amber-500/20 transition">
-                    <i class="fa-solid fa-download text-xs"></i>
-                    <span>تصدير GIF</span>
-                </button>
-                <button onclick="saveCurrentProject()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 transition shadow-md shadow-emerald-600/20" title="حفظ الرسمة الحالية">
-                    <i class="fa-solid fa-floppy-disk text-xs"></i>
-                    <span>حفظ</span>
-                </button>
-                <button onclick="openProjectsModal()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 transition shadow-md shadow-indigo-600/20" title="معرض مشاريع باسم">
-                    <i class="fa-solid fa-folder-open text-xs"></i>
-                    <span>مشاريعي</span>
-                </button>
-                <button onclick="createNewProject()" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 active:scale-95 text-slate-200 rounded-xl text-xs font-black flex items-center gap-1 transition" title="رسمة جديدة فارغة">
-                    <i class="fa-solid fa-plus text-xs"></i>
-                    <span>جديد</span>
-                </button>
             </div>
         </div>
 
