@@ -348,6 +348,17 @@
                         <i class="fa-solid fa-eraser text-rose-400"></i>
                         <span>ممحاة</span>
                     </button>
+                    <!-- Text Tool -->
+                    <button id="btnToolText" onclick="addTextToCanvas()" class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1 transition active:scale-95" title="إضافة نص للرسمة">
+                        <i class="fa-solid fa-font text-cyan-400"></i>
+                        <span>نص</span>
+                    </button>
+                    <!-- Image Upload Tool -->
+                    <label class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1 transition active:scale-95 cursor-pointer" title="إضافة صورة خارجية">
+                        <i class="fa-solid fa-image text-emerald-400"></i>
+                        <span>صورة</span>
+                        <input type="file" id="imgUploadInput" accept="image/*" onchange="uploadImageToCanvas(event)" class="hidden">
+                    </label>
                 </div>
 
                 <!-- Undo and Clear -->
@@ -365,10 +376,11 @@
             <div class="flex items-center justify-between gap-2 flex-wrap pt-1 border-t border-slate-800/70">
                 <!-- Color Bubbles -->
                 <div class="flex items-center gap-1.5 overflow-x-auto py-1 custom-scroll">
-                    <!-- Native Color input -->
-                    <div class="relative w-7 h-7 shrink-0 rounded-full overflow-hidden border-2 border-white/60 shadow cursor-pointer">
-                        <input type="color" id="nativeColorPicker" value="#f43f5e" oninput="setColor(this.value)" class="absolute -top-2 -left-2 w-12 h-12 cursor-pointer border-0 p-0">
-                    </div>
+                    <!-- Android Native Palette Button -->
+                    <label class="relative w-8 h-8 shrink-0 rounded-xl bg-gradient-to-tr from-pink-500 via-rose-500 to-yellow-400 flex items-center justify-center border-2 border-white/80 shadow cursor-pointer active:scale-90 transition" title="لوحة ألوان أندرويد الكاملة">
+                        <i class="fa-solid fa-palette text-white text-xs drop-shadow"></i>
+                        <input type="color" id="nativeColorPicker" value="#f43f5e" oninput="setColor(this.value)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                    </label>
                     <!-- Quick Preset Colors -->
                     <button onclick="setColor('#000000')" class="color-bubble w-6 h-6 shrink-0 rounded-full bg-black border border-slate-600 shadow"></button>
                     <button onclick="setColor('#ffffff')" class="color-bubble w-6 h-6 shrink-0 rounded-full bg-white border border-slate-400 shadow"></button>
@@ -1133,6 +1145,12 @@
             document.getElementById('playingBadge').classList.remove('hidden');
             document.getElementById('playingBadge').classList.add('inline-flex');
 
+            // سحب الشاشة للأعلى بنعومة لرؤية الرسمة أثناء التشغيل
+            const canvasElem = document.getElementById('paintCanvas');
+            if (canvasElem) {
+                canvasElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
             // Hide onion skin during playback
             oCtx.clearRect(0, 0, CANVAS_DIM, CANVAS_DIM);
 
@@ -1172,9 +1190,22 @@
         function updateFPS(val) {
             fps = parseInt(val, 10);
             document.getElementById('fpsNum').innerText = fps;
-            if (isPlaying) {
-                stopPlayback();
-                startPlayback();
+            if (isPlaying && playIntervalId) {
+                // تعديل سرعة المؤقت فورا بدون إيقاف أو إعادة الفريم
+                clearInterval(playIntervalId);
+                const intervalMs = Math.round(1000 / fps);
+                let playIdx = currentFrameIndex;
+                playIntervalId = setInterval(() => {
+                    const img = new Image();
+                    img.onload = () => {
+                        pCtx.clearRect(0, 0, CANVAS_DIM, CANVAS_DIM);
+                        pCtx.drawImage(img, 0, 0);
+                    };
+                    img.src = frames[playIdx];
+                    document.getElementById("currentFrameDisplay").innerText = playIdx + 1;
+                    highlightCurrentThumb(playIdx);
+                    playIdx = (playIdx + 1) % frames.length;
+                }, intervalMs);
             }
         }
 
@@ -1452,6 +1483,68 @@
             }, 3200);
         }
     </script>
+
+        // دالة إضافة نص على الكانفاس لباسم ورندة
+        function addTextToCanvas() {
+            const userText = prompt("اكتب النص أو الكلمة اللي بدك تضيفها يا فنان:", "باسم ورندة 🌟");
+            if (!userText || !userText.trim()) return;
+
+            pushUndo();
+            playSound("pop");
+
+            pCtx.save();
+            pCtx.font = `bold ${Math.max(brushSize * 4, 28)}px Cairo, sans-serif`;
+            pCtx.fillStyle = currentColor;
+            pCtx.textAlign = "center";
+            pCtx.textBaseline = "middle";
+            pCtx.shadowColor = "rgba(0,0,0,0.4)";
+            pCtx.shadowBlur = 4;
+            // رسم النص في وسط اللوحة
+            pCtx.fillText(userText.trim(), CANVAS_DIM / 2, CANVAS_DIM / 2);
+            pCtx.restore();
+
+            saveActiveFrame();
+            updateFilmstripThumbnail(currentFrameIndex);
+            showToast("تمت إضافة النص بنجاح!", "font");
+        }
+
+        // دالة إضافة صورة خارجية من استوديو الجهاز
+        function uploadImageToCanvas(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    pushUndo();
+                    playSound("magic");
+
+                    // ضبط مقاسات الصورة لتناسب حجم الكانفاس مع الحفاظ على التناسق
+                    let w = img.width;
+                    let h = img.height;
+                    const maxDim = CANVAS_DIM * 0.85;
+
+                    if (w > maxDim || h > maxDim) {
+                        const ratio = Math.min(maxDim / w, maxDim / h);
+                        w = w * ratio;
+                        h = h * ratio;
+                    }
+
+                    const x = (CANVAS_DIM - w) / 2;
+                    const y = (CANVAS_DIM - h) / 2;
+
+                    pCtx.drawImage(img, x, y, w, h);
+                    saveActiveFrame();
+                    updateFilmstripThumbnail(currentFrameIndex);
+                    showToast("تم إدراج الصورة بنجاح!", "image");
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = "";
+        }
+
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
