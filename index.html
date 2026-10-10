@@ -61,377 +61,51 @@
             list.innerHTML = keys.map(k => {
                 const p = projects[k];
                 return `
-                <div class="bg-studio-800 border border-slate-700/60 rounded-xl p-3 flex flex-col items-center gap-2 group hover:border-indigo-500 transition">
-                    <img src="${p.thumbnail}" class="w-full h-28 object-contain bg-white rounded-lg border border-slate-700">
-                    <div class="w-full text-right">
-                        <div class="font-bold text-white text-xs truncate" title="${p.name}">${p.name}</div>
-                        <div class="text-[10px] text-slate-400 flex justify-between mt-1">
-                            <span>${p.frameCount} فريم</span>
-                            <span>${p.updatedAt}</span>
-                        </div>
+                <!-- شريط التشغيل والمشاريع المتناسق -->
+            <div class="bg-studio-800/90 border border-slate-700/70 rounded-2xl p-2.5 flex flex-col gap-2.5 shadow-lg">
+                <!-- السطر الأول: أزرار العرض والتحريك -->
+                <div class="flex items-center justify-between gap-2 border-b border-slate-700/50 pb-2">
+                    <button id="btnPlay" onclick="togglePlay()" class="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1.5 transition shadow-md shadow-emerald-500/20">
+                        <i class="fa-solid fa-play text-xs"></i>
+                        <span id="playBtnText">تشغيل</span>
+                    </button>
+                    
+                    <div class="flex items-center gap-1 text-slate-400">
+                        <button onclick="prevFrame()" class="w-7 h-7 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-200 flex items-center justify-center transition active:scale-90" title="الفريم السابق">
+                            <i class="fa-solid fa-backward-step text-xs"></i>
+                        </button>
+                        <button onclick="nextFrame()" class="w-7 h-7 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-200 flex items-center justify-center transition active:scale-90" title="الفريم التالي">
+                            <i class="fa-solid fa-forward-step text-xs"></i>
+                        </button>
                     </div>
-                    <div class="flex items-center gap-1 w-full mt-1">
-                        <button onclick="loadSavedProject('${p.id}')" class="flex-1 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[11px] font-bold transition">فتح</button>
-                        <button onclick="exportProjectFile('${p.id}')" class="p-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-[11px]" title="تنزيل ملف .basim"><i class="fa-solid fa-download"></i></button>
-                        <button onclick="deleteSavedProject('${p.id}')" class="p-1 bg-rose-900/60 hover:bg-rose-600 text-rose-300 hover:text-white rounded text-[11px]" title="حذف"><i class="fa-solid fa-trash"></i></button>
+
+                    <div class="flex items-center gap-1.5 bg-slate-900/60 px-2.5 py-1 rounded-xl border border-slate-700/40">
+                        <span class="text-[10px] text-slate-400 font-bold">FPS</span>
+                        <input id="fpsSlider" type="range" min="1" max="24" value="6" oninput="updateFps(this.value)" class="w-16 accent-teal-400 cursor-pointer h-1 bg-slate-700 rounded-lg">
+                        <span id="fpsDisplay" class="text-xs font-mono font-bold text-teal-400 w-4 text-center">6</span>
                     </div>
-                </div>`;
-            }).join("");
-        }
-
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-    }
-
-    function closeProjectsModal() {
-        const modal = document.getElementById("projectsModal");
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-    }
-
-    function loadSavedProject(id) {
-        const projects = getSavedProjects();
-        const p = projects[id];
-        if (!p) return;
-
-        if (confirm("هل تريد فتح مشروع (" + p.name + ")؟ تأكد من حفظ عملك الحالي.")) {
-            currentProjectId = p.id;
-            currentProjectName = p.name;
-            frames = [...p.frames];
-            currentFrameIndex = 0;
-
-            const filmstrip = document.getElementById("filmstrip");
-            if (filmstrip) filmstrip.innerHTML = "";
-            for (let i = 0; i < frames.length; i++) {
-                addThumbnailToFilmstrip(i);
-            }
-            loadFrame(0);
-            closeProjectsModal();
-        }
-    }
-
-    function deleteSavedProject(id) {
-        if (!confirm("هل أنت متأكد من حذف هذا المشروع؟")) return;
-        const projects = getSavedProjects();
-        delete projects[id];
-        localStorage.setItem("basim_projects", JSON.stringify(projects));
-        openProjectsModal();
-    }
-
-    function createNewProject() {
-        if (!confirm("بدء مشروع جديد فارغ؟ تأكد من حفظ مشروعك أولاً.")) return;
-        currentProjectId = "proj_" + Date.now();
-        currentProjectName = "مشروع جديد";
-        frames = [];
-        currentFrameIndex = 0;
-
-        const temp = document.createElement("canvas");
-        temp.width = 500;
-        temp.height = 500;
-        const ctx = temp.getContext("2d");
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, 500, 500);
-
-        frames.push(temp.toDataURL("image/png"));
-        const filmstrip = document.getElementById("filmstrip");
-        if (filmstrip) filmstrip.innerHTML = "";
-        addThumbnailToFilmstrip(0);
-        loadFrame(0);
-    }
-
-    function exportProjectFile(id) {
-        const projects = getSavedProjects();
-        const p = projects[id];
-        if (!p) return;
-        const blob = new Blob([JSON.stringify(p, null, 2)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${p.name}.basim`;
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-
-    function importProjectFile(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const imported = JSON.parse(e.target.result);
-                if (!imported.frames || !Array.isArray(imported.frames)) throw new Error("ملف غير صالح");
-                const projects = getSavedProjects();
-                const newId = "proj_" + Date.now();
-                imported.id = newId;
-                projects[newId] = imported;
-                localStorage.setItem("basim_projects", JSON.stringify(projects));
-                openProjectsModal();
-                alert("✅ تم استيراد المشروع بنجاح!");
-            } catch(err) {
-                alert("⚠️ فشل استيراد الملف. تأكد أنه ملف .basim صحيح.");
-            }
-        };
-        reader.readAsText(file);
-    }
-
-</script>
-    <!-- FontAwesome 6 CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts: Cairo & Fredoka -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
-    <!-- gifshot library for client-side GIF export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        studio: {
-                            950: '#070913',
-                            900: '#0e1322',
-                            800: '#182035',
-                            700: '#263352',
-                            accent: '#6366f1',
-                            glow: '#ec4899',
-                            coral: '#f43f5e',
-                            amber: '#f59e0b',
-                            emerald: '#10b981',
-                            cyan: '#06b6d4'
-                        }
-                    },
-                    fontFamily: {
-                        cairo: ['Cairo', 'sans-serif'],
-                        badge: ['Fredoka', 'Cairo', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        * {
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            -webkit-touch-callout: none;
-            touch-action: manipulation;
-        }
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: #080c16;
-            color: #f1f5f9;
-            overscroll-behavior: none;
-        }
-        #paintCanvas {
-            touch-action: none;
-            cursor: crosshair;
-        }
-        .custom-scroll::-webkit-scrollbar {
-            height: 6px;
-            width: 6px;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background-color: #334155;
-            border-radius: 9999px;
-        }
-        /* Color bucket ripple effect */
-        .color-bubble {
-            transition: transform 0.15s ease, border-color 0.15s ease;
-        }
-        .color-bubble:active {
-            transform: scale(0.85);
-        }
-    </style>
-    <!-- PWA Settings -->
-    <link rel="manifest" href="/manifest.json">
-    <link rel="icon" type="image/svg+xml" href="/icon.svg">
-    <link rel="apple-touch-icon" href="/icon.svg">
-    <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="استوديو باسم">
-</head>
-<body class="flex flex-col min-h-screen bg-studio-950 text-slate-100 selection:bg-rose-500 selection:text-white">
-
-    <header class="bg-studio-900 border-b border-slate-800 sticky top-0 z-40 px-3 py-2 sm:px-4 shadow-xl flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 via-indigo-600 to-cyan-400 p-[2px] shadow-lg shadow-indigo-500/20">
-                <div class="w-full h-full bg-studio-950 rounded-2xl flex items-center justify-center text-rose-400 font-black text-lg">
-                    <i class="fa-solid fa-paintbrush"></i>
-                </div>
-            </div>
-            <div>
-                <div class="flex items-center gap-1.5">
-                    <h1 class="text-base sm:text-lg font-black tracking-wide leading-none bg-gradient-to-r from-rose-400 via-amber-300 to-indigo-300 bg-clip-text text-transparent">
-                        استوديو باسم للأنميشن
-                    </h1>
-                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">الفنان المبدع 🎨 🚀</span>
-                </div>
-                <p class="text-[11px] text-slate-400 font-semibold mt-0.5">ارسم شخصياتك، لوّنها بالسطل، وحرّكها فريم بفريم!</p>
-            </div>
-        </div>
-
-        <!-- Header Actions -->
-        <div class="flex items-center gap-1.5 sm:gap-2">
-            <!-- Open AI Generator Modal -->
-            <button onclick="openAIModal()" class="px-3 py-2 bg-gradient-to-r from-rose-500 to-indigo-600 hover:opacity-95 active:scale-95 text-white font-black text-xs rounded-xl shadow-md shadow-rose-500/25 flex items-center gap-1.5 transition">
-                <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
-                <span>ابتكر شخصية بالـ AI</span>
-            </button>
-            </button>
-        </div>
-    </header>
-
-    <main class="flex-1 flex flex-col max-w-4xl w-full mx-auto p-2 sm:p-4 gap-2.5">
-        
-        <!-- Status Bar Above Canvas -->
-        <div class="flex items-center justify-between px-1 text-xs text-slate-400 font-semibold">
-            <div class="flex items-center gap-2">
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-studio-900 border border-slate-800 text-indigo-300 font-mono text-xs">
-                    <i class="fa-regular fa-clone text-[11px]"></i> فريم: <span id="currentFrameDisplay" class="font-bold text-white">1</span> / <span id="totalFramesDisplay">1</span>
-                </span>
-                <span id="playingBadge" class="hidden text-emerald-400 font-bold items-center gap-1 text-[11px] animate-pulse">
-                    <i class="fa-solid fa-circle-play"></i> يعرض الآن
-                </span>
-            </div>
-
-            <!-- Quick Controls: Onion Skin Toggle -->
-            <div class="flex items-center gap-3">
-                <label class="flex items-center gap-1.5 cursor-pointer bg-studio-900/90 border border-slate-800 px-2.5 py-1 rounded-xl text-slate-300 hover:text-white transition">
-                    <input type="checkbox" id="onionSkinToggle" checked class="w-4 h-4 accent-rose-500 rounded cursor-pointer">
-                    <span class="text-[11px] font-bold">قشرة البصل (Onion Skin)</span>
-                </label>
-            </div>
-        </div>
-
-        <!-- The Canvas Workspace Container (Optimized 1:1 on mobile touch) -->
-        <div class="relative w-full max-w-[460px] aspect-square mx-auto bg-white rounded-2xl overflow-hidden shadow-2xl border-4 border-slate-800 flex items-center justify-center select-none">
-            <!-- Background checkerboard pattern for transparent regions -->
-            <div class="absolute inset-0 pointer-events-none opacity-20" style="background-image: repeating-conic-gradient(#cbd5e1 0% 25%, #ffffff 0% 50%); background-size: 20px 20px;"></div>
-
-            <!-- Onion skin ghost canvas -->
-            <canvas id="onionCanvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-30 z-10"></canvas>
-
-            <!-- Main active drawing & coloring canvas -->
-            <canvas id="paintCanvas" class="absolute inset-0 w-full h-full z-20"></canvas>
-
-            <!-- Loading overlay when AI line art is rendering -->
-            <div id="canvasLoader" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-30 hidden flex-col items-center justify-center text-center p-4">
-                <div class="w-14 h-14 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 text-2xl animate-spin mb-3">
-                    <i class="fa-solid fa-palette"></i>
-                </div>
-                <h4 class="text-sm font-black text-white">الذكاء الاصطناعي يرسم خطوط الشخصية لباسم...</h4>
-                <p class="text-xs text-slate-400 mt-1 max-w-xs">بنجهز الخطوط الخارجية النظيفة عشان تلوّنها بالسطل والفرشاة فوراً!</p>
-            </div>
-        </div>
-
-        <div class="bg-studio-900 border border-slate-800 rounded-2xl p-2.5 sm:p-3 shadow-xl flex flex-col gap-2.5 max-w-[460px] mx-auto w-full">
-            
-            <!-- Tool selection row: Brush, Bucket Fill, Eraser, Undo, Clear -->
-            <div class="flex items-center justify-between gap-1.5">
-                <div class="flex items-center gap-1 bg-studio-950 p-1 rounded-xl border border-slate-800/80">
-                    <!-- Brush Tool -->
-                    <button id="btnToolBrush" onclick="selectTool('brush')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white flex items-center gap-1 transition active:scale-95">
-                        <i class="fa-solid fa-paintbrush"></i>
-                        <span>فرشاة</span>
-                    </button>
-                    <!-- Bucket Fill Tool -->
-                    <button id="btnToolBucket" onclick="selectTool('bucket')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1 transition active:scale-95">
-                        <i class="fa-solid fa-fill-drip text-amber-400"></i>
-                        <span>سطل التلوين</span>
-                    </button>
-                    <!-- Eraser Tool -->
-                    <button id="btnToolEraser" onclick="selectTool('eraser')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1 transition active:scale-95">
-                        <i class="fa-solid fa-eraser text-rose-400"></i>
-                        <span>ممحاة</span>
-                    </button>
                 </div>
 
-                <!-- Undo and Clear -->
-                <div class="flex items-center gap-1">
-                    <button onclick="undo()" class="w-9 h-9 rounded-xl bg-studio-800 hover:bg-studio-700 text-slate-200 border border-slate-700/70 flex items-center justify-center transition active:scale-90" title="تراجع">
-                        <i class="fa-solid fa-rotate-left text-sm"></i>
+                <!-- السطر الثاني: المشاريع وتصدير GIF -->
+                <div class="flex items-center justify-between gap-1.5 flex-wrap">
+                    <button onclick="exportAnimationGif()" class="flex-1 py-1.5 bg-gradient-to-r from-amber-500 to-rose-500 hover:opacity-90 active:scale-95 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1 shadow-md shadow-amber-500/20 transition">
+                        <i class="fa-solid fa-download text-xs"></i>
+                        <span>تصدير GIF</span>
                     </button>
-                    <button onclick="clearCurrentCanvas()" class="w-9 h-9 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40 flex items-center justify-center transition active:scale-90" title="مسح الفريم">
-                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    <button onclick="saveCurrentProject()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 transition shadow-md shadow-emerald-600/20" title="حفظ الرسمة الحالية">
+                        <i class="fa-solid fa-floppy-disk text-xs"></i>
+                        <span>حفظ</span>
+                    </button>
+                    <button onclick="openProjectsModal()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 transition shadow-md shadow-indigo-600/20" title="معرض مشاريع باسم">
+                        <i class="fa-solid fa-folder-open text-xs"></i>
+                        <span>مشاريعي</span>
+                    </button>
+                    <button onclick="createNewProject()" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 active:scale-95 text-slate-200 rounded-xl text-xs font-black flex items-center gap-1 transition" title="رسمة جديدة فارغة">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>جديد</span>
                     </button>
                 </div>
             </div>
-
-            <!-- Color Palette and Brush Thickness -->
-            <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/70">
-                <!-- Color Bubbles -->
-                <div class="flex items-center gap-1.5 overflow-x-auto py-1 custom-scroll">
-                    <!-- Native Color input -->
-                    <div class="relative w-7 h-7 shrink-0 rounded-full overflow-hidden border-2 border-white/60 shadow cursor-pointer">
-                        <input type="color" id="nativeColorPicker" value="#f43f5e" oninput="setColor(this.value)" class="absolute -top-2 -left-2 w-12 h-12 cursor-pointer border-0 p-0">
-                    </div>
-                    <!-- Quick Preset Colors -->
-                    <button onclick="setColor('#000000')" class="color-bubble w-6 h-6 shrink-0 rounded-full bg-black border border-slate-600 shadow"></button>
-                    <button onclick="setColor('#ffffff')" class="color-bubble w-6 h-6 shrink-0 rounded-full bg-white border border-slate-400 shadow"></button>
-                    <button onclick="setColor('#f43f5e')" class="color-bubble w-6 h-6 shrink-0 rounded-full bg-rose-500 shadow"></button>
-                    <button onclick="setColor('#f59e0b')" class="color-bubble w-6 h-6 shrink-0 rounded-full bg-amber-500 shadow"></button>
-                    <button onclick="setColor('#10b981')" class="color-bubble w-6 h-6 shrink-0 rounded-full bg-emerald-500 shadow"></button>
-                    <button onclick="setColor('#06b6d4')" class="color-bubble w-6 h-6 shrink-0 rounded-full bg-cyan-500 shadow"></button>
-                    <button onclick="setColor('#6366f1')" class="color-bubble w-6 h-6 shrink-0 rounded-full bg-indigo-500 shadow"></button>
-                    <button onclick="setColor('#ec4899')" class="color-bubble w-6 h-6 shrink-0 rounded-full bg-pink-500 shadow"></button>
-                    <button onclick="setColor('#8b5cf6')" class="color-bubble w-6 h-6 shrink-0 rounded-full bg-purple-500 shadow"></button>
-                    <button onclick="setColor('#b45309')" class="color-bubble w-6 h-6 shrink-0 rounded-full bg-amber-700 shadow"></button>
-                </div>
-
-                <!-- Brush Thickness Slider -->
-                <div class="flex items-center gap-1.5 shrink-0 bg-studio-950 px-2 py-1 rounded-xl border border-slate-800">
-                    <span class="text-[10px] text-slate-400 font-bold">سمك:</span>
-                    <input type="range" id="brushSizeSlider" min="2" max="28" value="6" oninput="setBrushSize(this.value)" class="w-16 accent-indigo-500 cursor-pointer">
-                    <span id="brushSizeVal" class="text-[10px] font-mono text-indigo-300 w-3">6</span>
-                </div>
-            </div>
-
-            <!-- Playback & Export Controls -->
-            <div class="flex items-center justify-between gap-1.5 pt-1 border-t border-slate-800/70">
-                <div class="flex items-center gap-1.5">
-                    <!-- Play / Pause -->
-                    <button id="btnPlay" onclick="togglePlayback()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition">
-                        <i id="playIcon" class="fa-solid fa-play text-xs"></i>
-                        <span id="playLabel">تشغيل</span>
-                    </button>
-                    <!-- Prev Frame -->
-                    <button onclick="stepFrame(-1)" class="w-8 h-8 rounded-xl bg-studio-800 hover:bg-studio-700 active:scale-95 text-slate-300 border border-slate-700/60 flex items-center justify-center transition">
-                        <i class="fa-solid fa-backward-step text-xs"></i>
-                    </button>
-                    <!-- Next Frame -->
-                    <button onclick="stepFrame(1)" class="w-8 h-8 rounded-xl bg-studio-800 hover:bg-studio-700 active:scale-95 text-slate-300 border border-slate-700/60 flex items-center justify-center transition">
-                        <i class="fa-solid fa-forward-step text-xs"></i>
-                    </button>
-                </div>
-
-                <!-- FPS Speed control -->
-                <div class="flex items-center gap-1 text-xs text-slate-400">
-                    <span class="font-bold text-[11px] text-slate-300"><span id="fpsNum">6</span> FPS</span>
-                    <input type="range" id="fpsRange" min="1" max="18" value="6" oninput="updateFPS(this.value)" class="w-14 accent-emerald-500 cursor-pointer">
-                </div>
-
-                <!-- Export GIF button -->
-                <button onclick="exportAnimationGif()" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-rose-500 hover:opacity-90 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-md shadow-amber-500/20 transition">
-                    <i class="fa-solid fa-download text-xs"></i>
-                    <span>تصدير GIF</span>
-                </button>
-                <button onclick="saveCurrentProject()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 transition shadow-md shadow-emerald-600/20" title="حفظ الرسمة الحالية">
-                    <i class="fa-solid fa-floppy-disk text-xs"></i>
-                    <span>حفظ</span>
-                </button>
-                <button onclick="openProjectsModal()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 transition shadow-md shadow-indigo-600/20" title="معرض مشاريع باسم">
-                    <i class="fa-solid fa-folder-open text-xs"></i>
-                    <span>مشاريعي</span>
-                </button>
-                <button onclick="createNewProject()" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 active:scale-95 text-slate-200 rounded-xl text-xs font-black flex items-center gap-1 transition" title="رسمة جديدة فارغة">
-                    <i class="fa-solid fa-plus text-xs"></i>
-                    <span>جديد</span>
-                </button>
-            </div>
-        </div>
 
         <div class="bg-studio-900 border border-slate-800 rounded-2xl p-3 shadow-xl flex flex-col gap-2 max-w-[460px] mx-auto w-full">
             <div class="flex items-center justify-between">
