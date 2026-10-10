@@ -426,22 +426,22 @@
                     </div>
                 </div>
 
-                <!-- السطر الثاني: أزرار التصدير والمشاريع -->
-                <div class="flex items-center justify-between gap-1.5">
-                    <button onclick="exportAnimationGif()" class="flex-1 py-1.5 bg-gradient-to-r from-amber-500 to-rose-500 hover:opacity-90 active:scale-95 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1 shadow-md shadow-amber-500/20 transition">
-                        <i class="fa-solid fa-download text-xs"></i>
-                        <span>تصدير GIF</span>
+                <!-- السطر الثاني: أزرار التصدير والمشاريع بنظام Grid متجاوب وموزون -->
+                <div class="grid grid-cols-4 gap-1.5 w-full">
+                    <button onclick="exportAnimationGif()" class="col-span-1 py-1.5 bg-gradient-to-r from-amber-500 to-rose-500 hover:opacity-90 active:scale-95 text-white rounded-xl text-[11px] font-black flex items-center justify-center gap-1 shadow-md shadow-amber-500/20 transition">
+                        <i class="fa-solid fa-download text-[10px]"></i>
+                        <span>GIF</span>
                     </button>
-                    <button onclick="saveCurrentProject()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 transition shadow-md shadow-emerald-600/20" title="حفظ الرسمة الحالية">
-                        <i class="fa-solid fa-floppy-disk text-xs"></i>
+                    <button onclick="saveCurrentProject()" class="col-span-1 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-[11px] font-black flex items-center justify-center gap-1 transition shadow-md shadow-emerald-600/20" title="حفظ الرسمة الحالية">
+                        <i class="fa-solid fa-floppy-disk text-[10px]"></i>
                         <span>حفظ</span>
                     </button>
-                    <button onclick="openProjectsModal()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 transition shadow-md shadow-indigo-600/20" title="معرض مشاريع باسم">
-                        <i class="fa-solid fa-folder-open text-xs"></i>
+                    <button onclick="openProjectsModal()" class="col-span-1 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-xl text-[11px] font-black flex items-center justify-center gap-1 transition shadow-md shadow-indigo-600/20" title="معرض مشاريع باسم">
+                        <i class="fa-solid fa-folder-open text-[10px]"></i>
                         <span>مشاريعي</span>
                     </button>
-                    <button onclick="createNewProject()" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 active:scale-95 text-slate-200 rounded-xl text-xs font-black flex items-center gap-1 transition" title="رسمة جديدة فارغة">
-                        <i class="fa-solid fa-plus text-xs"></i>
+                    <button onclick="createNewProject()" class="col-span-1 py-1.5 bg-slate-700 hover:bg-slate-600 active:scale-95 text-slate-200 rounded-xl text-[11px] font-black flex items-center justify-center gap-1 transition" title="رسمة جديدة فارغة">
+                        <i class="fa-solid fa-plus text-[10px]"></i>
                         <span>جديد</span>
                     </button>
                 </div>
@@ -1484,68 +1484,7 @@
         }
     </script>
 
-        // دالة إضافة نص على الكانفاس لباسم ورندة
-        function addTextToCanvas() {
-            const userText = prompt("اكتب النص أو الكلمة اللي بدك تضيفها يا فنان:", "باسم ورندة 🌟");
-            if (!userText || !userText.trim()) return;
-
-            pushUndo();
-            playSound("pop");
-
-            pCtx.save();
-            pCtx.font = `bold ${Math.max(brushSize * 4, 28)}px Cairo, sans-serif`;
-            pCtx.fillStyle = currentColor;
-            pCtx.textAlign = "center";
-            pCtx.textBaseline = "middle";
-            pCtx.shadowColor = "rgba(0,0,0,0.4)";
-            pCtx.shadowBlur = 4;
-            // رسم النص في وسط اللوحة
-            pCtx.fillText(userText.trim(), CANVAS_DIM / 2, CANVAS_DIM / 2);
-            pCtx.restore();
-
-            saveActiveFrame();
-            updateFilmstripThumbnail(currentFrameIndex);
-            showToast("تمت إضافة النص بنجاح!", "font");
-        }
-
-        // دالة إضافة صورة خارجية من استوديو الجهاز
-        function uploadImageToCanvas(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    pushUndo();
-                    playSound("magic");
-
-                    // ضبط مقاسات الصورة لتناسب حجم الكانفاس مع الحفاظ على التناسق
-                    let w = img.width;
-                    let h = img.height;
-                    const maxDim = CANVAS_DIM * 0.85;
-
-                    if (w > maxDim || h > maxDim) {
-                        const ratio = Math.min(maxDim / w, maxDim / h);
-                        w = w * ratio;
-                        h = h * ratio;
-                    }
-
-                    const x = (CANVAS_DIM - w) / 2;
-                    const y = (CANVAS_DIM - h) / 2;
-
-                    pCtx.drawImage(img, x, y, w, h);
-                    saveActiveFrame();
-                    updateFilmstripThumbnail(currentFrameIndex);
-                    showToast("تم إدراج الصورة بنجاح!", "image");
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-            event.target.value = "";
-        }
-
-    <script>
+        <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker.register("/sw.js").catch(console.error);
@@ -1577,6 +1516,68 @@
             </div>
         </div>
     </div>
+
+
+    <script>
+        // دالة إضافة نص على الكانفاس لباسم ورندة
+        function addTextToCanvas() {
+            const userText = prompt("اكتب النص أو الكلمة اللي بدك تضيفها يا فنان:", "باسم ورندة 🌟");
+            if (!userText || !userText.trim()) return;
+
+            pushUndo();
+            playSound("pop");
+
+            pCtx.save();
+            pCtx.font = `bold ${Math.max(brushSize * 4, 28)}px Cairo, sans-serif`;
+            pCtx.fillStyle = currentColor;
+            pCtx.textAlign = "center";
+            pCtx.textBaseline = "middle";
+            pCtx.shadowColor = "rgba(0,0,0,0.4)";
+            pCtx.shadowBlur = 4;
+            pCtx.fillText(userText.trim(), CANVAS_DIM / 2, CANVAS_DIM / 2);
+            pCtx.restore();
+
+            saveActiveFrame();
+            updateFilmstripThumbnail(currentFrameIndex);
+            showToast("تمت إضافة النص بنجاح!", "font");
+        }
+
+        // دالة إضافة صورة خارجية من استوديو الجهاز
+        function uploadImageToCanvas(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    pushUndo();
+                    playSound("magic");
+
+                    let w = img.width;
+                    let h = img.height;
+                    const maxDim = CANVAS_DIM * 0.85;
+
+                    if (w > maxDim || h > maxDim) {
+                        const ratio = Math.min(maxDim / w, maxDim / h);
+                        w = w * ratio;
+                        h = h * ratio;
+                    }
+
+                    const x = (CANVAS_DIM - w) / 2;
+                    const y = (CANVAS_DIM - h) / 2;
+
+                    pCtx.drawImage(img, x, y, w, h);
+                    saveActiveFrame();
+                    updateFilmstripThumbnail(currentFrameIndex);
+                    showToast("تم إدراج الصورة بنجاح!", "image");
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = "";
+        }
+    </script>
 
 </body>
 </html>
