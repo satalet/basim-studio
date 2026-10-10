@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="brushGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="50%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+    <linearGradient id="circleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Rounded Rect -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="none" stroke="#334155" stroke-width="6"/>
+
+  <!-- Palette glow circle -->
+  <circle cx="256" cy="256" r="160" fill="#1e293b" stroke="url(#circleGrad)" stroke-width="8"/>
+
+  <!-- Paint Blobs -->
+  <circle cx="180" cy="190" r="28" fill="#f43f5e"/>
+  <circle cx="256" cy="160" r="28" fill="#fbbf24"/>
+  <circle cx="332" cy="190" r="28" fill="#34d399"/>
+  <circle cx="350" cy="270" r="28" fill="#38bdf8"/>
+  <circle cx="170" cy="270" r="28" fill="#c084fc"/>
+
+  <!-- Central Magic Art Pen / Sparkle -->
+  <g transform="translate(256, 280) rotate(-45)">
+    <path d="M-20,-70 L20,-70 L15,40 L0,75 L-15,40 Z" fill="url(#brushGrad)"/>
+    <circle cx="0" cy="75" r="7" fill="#fbbf24"/>
+  </g>
+
+  <!-- Stars / Sparkles -->
+  <path d="M256,60 L262,80 L282,86 L262,92 L256,112 L250,92 L230,86 L250,80 Z" fill="#fbbf24"/>
+  <path d="M110,120 L114,132 L126,136 L114,140 L110,152 L106,140 L94,136 L106,132 Z" fill="#38bdf8"/>
+  <path d="M400,370 L404,382 L416,386 L404,390 L400,402 L396,390 L384,386 L396,382 Z" fill="#f43f5e"/>
+
+  <!-- Bottom Badge: BASIM -->
+  <rect x="136" y="400" width="240" height="48" rx="24" fill="#f43f5e"/>
+  <text x="256" y="433" font-family="system-ui, sans-serif" font-size="24" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="3">BASIM STUDIO</text>
+</svg>

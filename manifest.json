@@ -1,0 +1,20 @@
+{
+  "name": "استوديو باسم للأنميشن",
+  "short_name": "استوديو باسم",
+  "description": "استوديو الأنميشن والرسم الذكي للفنان المبدع باسم",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

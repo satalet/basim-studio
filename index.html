@@ -75,6 +75,14 @@
             transform: scale(0.85);
         }
     </style>
+    <!-- PWA Settings -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="apple-touch-icon" href="/icon.svg">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="استوديو باسم">
 </head>
 <body class="flex flex-col min-h-screen bg-studio-950 text-slate-100 selection:bg-rose-500 selection:text-white">
 
@@ -1256,6 +1264,13 @@
                 toast.classList.add('translate-y-24', 'opacity-0');
             }, 3200);
         }
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js").catch(console.error);
+        });
+      }
     </script>
 </body>
 </html>
