@@ -5,7 +5,176 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>استوديو باسم للأنميشن | Basim Animation Studio</title>
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com">
+    // --- نظام إدارة المشاريع لباسم ---
+    let currentProjectName = "مشروع بدون عنوان";
+    let currentProjectId = "proj_" + Date.now();
+
+    function getSavedProjects() {
+        try {
+            return JSON.parse(localStorage.getItem("basim_projects") || "{}");
+        } catch(e) {
+            return {};
+        }
+    }
+
+    function saveCurrentProject(customName = null) {
+        if (!frames || frames.length === 0) return;
+        // حفظ الفريم الحالي أولاً
+        if (typeof paintCanvas !== "undefined" && typeof currentFrameIndex !== "undefined") {
+            frames[currentFrameIndex] = paintCanvas.toDataURL("image/png");
+        }
+
+        const projects = getSavedProjects();
+        const name = customName || prompt("اختر اسماً لمشروعك يا فنان:", currentProjectName) || currentProjectName;
+        currentProjectName = name;
+
+        projects[currentProjectId] = {
+            id: currentProjectId,
+            name: name,
+            frames: frames,
+            thumbnail: frames[0],
+            frameCount: frames.length,
+            updatedAt: new Date().toLocaleDateString("ar-EG")
+        };
+
+        try {
+            localStorage.setItem("basim_projects", JSON.stringify(projects));
+            alert("✅ تم حفظ مشروع: " + name);
+        } catch(e) {
+            alert("⚠️ تعذر الحفظ، قد تكون الذاكرة ممتلئة بالرسومات.");
+        }
+    }
+
+    function openProjectsModal() {
+        const modal = document.getElementById("projectsModal");
+        const list = document.getElementById("projectsListContainer");
+        const projects = getSavedProjects();
+        const keys = Object.keys(projects);
+
+        if (keys.length === 0) {
+            list.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 text-sm">
+                <i class="fa-solid fa-palette text-3xl mb-2 text-slate-600 block"></i>
+                لا توجد مشاريع محفوظة بعد. ابدأ برسم شخصية واحفظها!
+            </div>`;
+        } else {
+            list.innerHTML = keys.map(k => {
+                const p = projects[k];
+                return `
+                <div class="bg-studio-800 border border-slate-700/60 rounded-xl p-3 flex flex-col items-center gap-2 group hover:border-indigo-500 transition">
+                    <img src="${p.thumbnail}" class="w-full h-28 object-contain bg-white rounded-lg border border-slate-700">
+                    <div class="w-full text-right">
+                        <div class="font-bold text-white text-xs truncate" title="${p.name}">${p.name}</div>
+                        <div class="text-[10px] text-slate-400 flex justify-between mt-1">
+                            <span>${p.frameCount} فريم</span>
+                            <span>${p.updatedAt}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 w-full mt-1">
+                        <button onclick="loadSavedProject('${p.id}')" class="flex-1 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[11px] font-bold transition">فتح</button>
+                        <button onclick="exportProjectFile('${p.id}')" class="p-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-[11px]" title="تنزيل ملف .basim"><i class="fa-solid fa-download"></i></button>
+                        <button onclick="deleteSavedProject('${p.id}')" class="p-1 bg-rose-900/60 hover:bg-rose-600 text-rose-300 hover:text-white rounded text-[11px]" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join("");
+        }
+
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+    }
+
+    function closeProjectsModal() {
+        const modal = document.getElementById("projectsModal");
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    }
+
+    function loadSavedProject(id) {
+        const projects = getSavedProjects();
+        const p = projects[id];
+        if (!p) return;
+
+        if (confirm("هل تريد فتح مشروع (" + p.name + ")؟ تأكد من حفظ عملك الحالي.")) {
+            currentProjectId = p.id;
+            currentProjectName = p.name;
+            frames = [...p.frames];
+            currentFrameIndex = 0;
+
+            const filmstrip = document.getElementById("filmstrip");
+            if (filmstrip) filmstrip.innerHTML = "";
+            for (let i = 0; i < frames.length; i++) {
+                addThumbnailToFilmstrip(i);
+            }
+            loadFrame(0);
+            closeProjectsModal();
+        }
+    }
+
+    function deleteSavedProject(id) {
+        if (!confirm("هل أنت متأكد من حذف هذا المشروع؟")) return;
+        const projects = getSavedProjects();
+        delete projects[id];
+        localStorage.setItem("basim_projects", JSON.stringify(projects));
+        openProjectsModal();
+    }
+
+    function createNewProject() {
+        if (!confirm("بدء مشروع جديد فارغ؟ تأكد من حفظ مشروعك أولاً.")) return;
+        currentProjectId = "proj_" + Date.now();
+        currentProjectName = "مشروع جديد";
+        frames = [];
+        currentFrameIndex = 0;
+
+        const temp = document.createElement("canvas");
+        temp.width = 500;
+        temp.height = 500;
+        const ctx = temp.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, 500, 500);
+
+        frames.push(temp.toDataURL("image/png"));
+        const filmstrip = document.getElementById("filmstrip");
+        if (filmstrip) filmstrip.innerHTML = "";
+        addThumbnailToFilmstrip(0);
+        loadFrame(0);
+    }
+
+    function exportProjectFile(id) {
+        const projects = getSavedProjects();
+        const p = projects[id];
+        if (!p) return;
+        const blob = new Blob([JSON.stringify(p, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${p.name}.basim`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function importProjectFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (!imported.frames || !Array.isArray(imported.frames)) throw new Error("ملف غير صالح");
+                const projects = getSavedProjects();
+                const newId = "proj_" + Date.now();
+                imported.id = newId;
+                projects[newId] = imported;
+                localStorage.setItem("basim_projects", JSON.stringify(projects));
+                openProjectsModal();
+                alert("✅ تم استيراد المشروع بنجاح!");
+            } catch(err) {
+                alert("⚠️ فشل استيراد الملف. تأكد أنه ملف .basim صحيح.");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+</script>
     <!-- FontAwesome 6 CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Google Fonts: Cairo & Fredoka -->
@@ -1064,6 +1233,9 @@
                 const result = await response.json();
                 if (result.svgText) {
                     renderSvgToCanvas(result.svgText, prompt);
+                currentProjectName = prompt;
+                currentProjectId = "proj_" + Date.now();
+                setTimeout(() => { saveCurrentProject(prompt); }, 600);
                 } else {
                     renderFallbackCharacter(prompt);
                 }
@@ -1272,5 +1444,31 @@
         });
       }
     </script>
+
+    <!-- Projects Modal -->
+    <div id="projectsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-studio-900 border border-slate-700/80 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-studio-800/50">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-folder-open text-indigo-400 text-lg"></i>
+                    <h3 class="font-extrabold text-white text-base">معرض مشاريع باسم 🎨</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-bold text-white cursor-pointer transition">
+                        <i class="fa-solid fa-file-import ml-1"></i> استيراد ملف .basim
+                        <input type="file" accept=".basim,.json" onchange="importProjectFile(event)" class="hidden">
+                    </label>
+                    <button onclick="closeProjectsModal()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="projectsListContainer" class="p-6 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <!-- بطاقات المشاريع تُولد بالجافاسكريبت -->
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
