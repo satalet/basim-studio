@@ -90,7 +90,7 @@
                     <h1 class="text-base sm:text-lg font-black tracking-wide leading-none bg-gradient-to-r from-rose-400 via-amber-300 to-indigo-300 bg-clip-text text-transparent">
                         استوديو باسم للأنميشن
                     </h1>
-                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">12 سنة 🚀</span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">الفنان المبدع 🎨 🚀</span>
                 </div>
                 <p class="text-[11px] text-slate-400 font-semibold mt-0.5">ارسم شخصياتك، لوّنها بالسطل، وحرّكها فريم بفريم!</p>
             </div>
@@ -1076,49 +1076,25 @@
             document.getElementById('canvasLoader').classList.remove('hidden');
             document.getElementById('canvasLoader').classList.add('flex');
 
-            const apiKey = localStorage.getItem('basim_gemini_api_key') || "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
-            const systemPrompt = `You are a professional children's cartoon vector line-art artist for a 12-year-old animator named Basim.
-The user wants a clean, cute, coloring-book style character based on: "${prompt}".
-CRITICAL REQUIREMENTS:
-1. Generate ONLY valid, standalone SVG code starting with <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"> and ending with </svg>.
-2. Do NOT wrap in markdown blocks, do not include explanations or extra text.
-3. The SVG MUST have pure thick black outlines (stroke="#000000", stroke-width="6" to "10", stroke-linecap="round", stroke-linejoin="round").
-4. ALL body parts and shapes MUST have fill="#ffffff" (pure white closed contours) so the kid can use the Flood Fill Bucket tool to color them in!
-5. Center the character perfectly in the 500x500 viewport. Ensure bold, expressive cartoon features (large eyes, clear head, body, arms/legs, props).`;
-
             try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: `Generate coloring-book line-art SVG for: "${prompt}"` }] }],
-                        systemInstruction: { parts: [{ text: systemPrompt }] }
-                    })
+                const response = await fetch("/api/generate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ prompt: prompt })
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API HTTP Error: ${response.status}`);
+                    throw new Error(`Server returned status: ${response.status}`);
                 }
 
                 const result = await response.json();
-                let svgText = result?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-
-                // Clean potential markdown quotes
-                svgText = svgText.replace(/```xml/gi, '').replace(/```svg/gi, '').replace(/```/g, '').trim();
-
-                const svgStart = svgText.indexOf('<svg');
-                const svgEnd = svgText.lastIndexOf('</svg>');
-
-                if (svgStart !== -1 && svgEnd !== -1) {
-                    svgText = svgText.substring(svgStart, svgEnd + 6);
-                    renderSvgToCanvas(svgText, prompt);
+                if (result.svgText) {
+                    renderSvgToCanvas(result.svgText, prompt);
                 } else {
                     renderFallbackCharacter(prompt);
                 }
             } catch (err) {
-                console.warn("Direct API call fallback triggered:", err);
+                console.warn("API generate error, fallback to default character:", err);
                 renderFallbackCharacter(prompt);
             } finally {
                 btn.disabled = false;

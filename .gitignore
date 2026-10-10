@@ -1,1 +1,6 @@
 .env
+.dev.vars
+.dev.vars
+test_gemini.py
+*.bak
+.wrangler/
