@@ -404,6 +404,1555 @@
                             <i class="fa-solid fa-forward-step text-xs"></i>
                         </button>
                     </div>
+
+                    
+                    <!-- زر دبلجة وتسجيل مباشر لباسم ورندا -->
+                    <div id="dubInlineBox" class="flex items-center gap-1">
+    <button id="btnDirectDub" onclick="handleDubAction()" class="px-2.5 py-1.5 bg-gradient-to-r from-rose-500 to-pink-600 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow transition">
+        <span id="dubDot" class="w-2 h-2 rounded-full bg-white inline-block"></span>
+        <span id="dubText">سجّل 🎙️</span>
+    </button>
+    <button id="btnDubPreviewMini" onclick="playDubPreview()" class="hidden w-7 h-7 bg-indigo-600 active:scale-90 text-white rounded-xl text-xs font-black items-center justify-center transition" title="معاينة">
+        <i class="fa-solid fa-play text-[10px]"></i>
+    </button>
+    <button id="btnDubResetMini" onclick="resetDubAction()" class="hidden w-7 h-7 bg-slate-700 active:scale-90 text-slate-300 rounded-xl text-xs font-black items-center justify-center transition" title="إعادة">
+        <i class="fa-solid fa-rotate-right text-[10px]"></i>
+    </button>
+</div>
+
+                    <!-- FPS Speed control -->
+                    <div class="flex items-center gap-1.5 bg-studio-950 px-2.5 py-1 rounded-xl border border-slate-800 text-xs text-slate-400">
+                        <span class="font-bold text-[11px] text-slate-300"><span id="fpsNum">6</span> FPS</span>
+                        <input type="range" id="fpsRange" min="1" max="18" value="6" oninput="updateFPS(this.value)" class="w-16 accent-emerald-500 cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- السطر الثاني: أزرار التصدير والمشاريع بنظام Grid متجاوب وموزون -->
+                <div class="grid grid-cols-4 gap-1.5 w-full">
+                    <button onclick="exportAnimationGif()" class="col-span-1 py-1.5 bg-gradient-to-r from-amber-500 to-rose-500 hover:opacity-90 active:scale-95 text-white rounded-xl text-[11px] font-black flex items-center justify-center gap-1 shadow-md shadow-amber-500/20 transition">
+                        <i class="fa-solid fa-download text-[10px]"></i>
+                        <span>GIF</span>
+                    </button>
+                    <button onclick="saveCurrentProject()" class="col-span-1 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-[11px] font-black flex items-center justify-center gap-1 transition shadow-md shadow-emerald-600/20" title="حفظ الرسمة الحالية">
+                        <i class="fa-solid fa-floppy-disk text-[10px]"></i>
+                        <span>حفظ</span>
+                    </button>
+                    <button onclick="openProjectsModal()" class="col-span-1 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-xl text-[11px] font-black flex items-center justify-center gap-1 transition shadow-md shadow-indigo-600/20" title="معرض مشاريع باسم">
+                        <i class="fa-solid fa-folder-open text-[10px]"></i>
+                        <span>مشاريعي</span>
+                    </button>
+                    <button onclick="createNewProject()" class="col-span-1 py-1.5 bg-slate-700 hover:bg-slate-600 active:scale-95 text-slate-200 rounded-xl text-[11px] font-black flex items-center justify-center gap-1 transition" title="رسمة جديدة فارغة">
+                        <i class="fa-solid fa-plus text-[10px]"></i>
+                        <span>جديد</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-studio-900 border border-slate-800 rounded-2xl p-2 sm:p-3 shadow-xl flex flex-col gap-2 w-full max-w-[min(440px,94vw)] mx-auto overflow-hidden">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-film text-rose-400 text-sm"></i>
+                    <h3 class="text-xs sm:text-sm font-extrabold text-slate-200">شريط الفريمات (Timeline)</h3>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button onclick="addNewBlankFrame()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold flex items-center gap-1 transition shadow active:scale-95" title="إضافة فريم فارغ">
+                        <i class="fa-solid fa-plus"></i> فريم فارغ
+                    </button>
+                    <button onclick="duplicateCurrentFrame()" class="px-2.5 py-1 bg-studio-700 hover:bg-studio-600 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold flex items-center gap-1 transition active:scale-95" title="نسخ الفريم الحالي لتعديل الحركة">
+                        <i class="fa-solid fa-copy"></i> تكرار وتعديل
+                    </button>
+                    <button onclick="deleteCurrentFrame()" class="p-1 px-2 bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800/40 rounded-lg text-xs font-bold transition active:scale-95" title="حذف الفريم">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Horizontal Filmstrip -->
+            <div id="framesStrip" class="flex items-center gap-2 overflow-x-auto py-1.5 px-0.5 custom-scroll">
+                <!-- Dynamically generated frames -->
+            </div>
+        </div>
+
+    </main>
+
+    <div id="aiModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
+        <div class="bg-studio-900 border border-slate-700 w-full max-w-lg rounded-2xl p-4 sm:p-5 flex flex-col max-h-[92vh] shadow-2xl overflow-hidden">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center gap-2 text-rose-400">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 to-indigo-600 flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-black text-white leading-tight">مولد شخصيات باسم (Gemini AI)</h3>
+                        <p class="text-[11px] text-slate-400 font-semibold">اكتب فكرتك والذكاء الاصطناعي يرسم الخطوط لتلوّنها فوراً!</p>
+                    </div>
+                </div>
+                <button onclick="closeAIModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="flex-1 overflow-y-auto py-3 space-y-3 custom-scroll">
+                <div>
+                    <label class="block text-xs font-black text-slate-200 mb-1.5">
+                        شو شخصية البطل اللي بدك نرسمها يا كابتن باسم؟ 🎨
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="text" id="aiCharacterPrompt" placeholder="مثال: فهد سريع لابس خوذة فضاء، روبوت نينجا بالسيف..." class="flex-1 bg-studio-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-rose-500">
+                        <button onclick="requestAILineArt()" id="btnGenerateAI" class="px-3.5 py-2.5 bg-gradient-to-r from-rose-500 to-indigo-600 hover:opacity-95 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-md shadow-rose-500/30 shrink-0 active:scale-95 transition">
+                            <i class="fa-solid fa-sparkles text-amber-300"></i>
+                            <span>ارسمها لي</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Inspiration Chips -->
+                <div>
+                    <span class="text-[11px] font-bold text-slate-400 block mb-1">أفكار خارقة سريعة:</span>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="setPromptIdea('روبوت نينجا صغير شايل سيف ليزر')" class="text-[11px] bg-studio-950 hover:bg-studio-800 text-indigo-300 px-2.5 py-1 rounded-full border border-slate-800">🤖 روبوت نينجا</button>
+                        <button onclick="setPromptIdea('فهد سريع لابس خوذة رائد فضاء')" class="text-[11px] bg-studio-950 hover:bg-studio-800 text-amber-300 px-2.5 py-1 rounded-full border border-slate-800">🐆 فهد فضاء</button>
+                        <button onclick="setPromptIdea('ديناصور لطيف لابس كاب تزلج')" class="text-[11px] bg-studio-950 hover:bg-studio-800 text-rose-300 px-2.5 py-1 rounded-full border border-slate-800">🦖 ديناصور متزلج</button>
+                        <button onclick="setPromptIdea('صقر ذهبي باجنحة نارية')" class="text-[11px] bg-studio-950 hover:bg-studio-800 text-cyan-300 px-2.5 py-1 rounded-full border border-slate-800">🦅 صقر ناري</button>
+                    </div>
+                </div>
+
+                <!-- Generation Status & Log Box -->
+                <div id="aiLogBox" class="bg-studio-950 border border-slate-800/80 rounded-xl p-3 min-h-[140px] text-xs text-slate-300 flex flex-col items-center justify-center text-center">
+                    <i class="fa-solid fa-film text-3xl text-slate-700 mb-2"></i>
+                    <p class="font-bold text-slate-400">اكتب فكرتك واضغط "ارسمها لي".</p>
+                    <p class="text-[11px] text-slate-500 mt-1 max-w-xs">سيقوم المساعد برسم خطوط خارجية سوداء عريضة ومغلقة كصفحات التلوين، ليسهل عليك تلوينها وتحريكها!</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="pt-2 border-t border-slate-800 flex justify-end">
+                <button onclick="closeAIModal()" class="px-4 py-2 bg-studio-800 hover:bg-studio-700 text-xs font-bold rounded-xl text-slate-300">
+                    إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <div id="exportModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
+        <div class="bg-studio-900 border border-slate-700 w-full max-w-sm rounded-2xl p-4 flex flex-col items-center text-center shadow-2xl">
+            <h3 class="text-sm font-black text-white mb-1" id="exportModalTitle">جاري تصدير أنميشن باسم...</h3>
+            
+            <div id="exportSpinner" class="my-5">
+                <i class="fa-solid fa-film text-rose-500 text-4xl animate-bounce"></i>
+            </div>
+
+            <div id="exportPreviewArea" class="hidden my-3 w-48 h-48 bg-white rounded-xl overflow-hidden border-2 border-rose-500 shadow-xl flex items-center justify-center">
+                <img id="exportResultImg" src="" alt="Basim Animation" class="w-full h-full object-contain">
+            </div>
+
+            <p id="exportSubtitle" class="text-xs text-slate-400 mb-3">نقوم بتحويل فريمات الكرتون إلى ملف GIF خفيف وسريع.</p>
+
+            <div class="flex gap-2 w-full justify-center">
+                <a id="btnDownloadGif" href="#" download="basim_cartoon.gif" class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black items-center gap-1.5 shadow active:scale-95 transition">
+                    <i class="fa-solid fa-download"></i> حفظ في الهاتف
+                </a>
+                <button onclick="toggleModal('exportModal')" class="px-4 py-2 bg-studio-800 hover:bg-studio-700 text-white rounded-xl text-xs font-bold">
+                    إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-4 right-4 left-4 sm:left-auto sm:w-80 bg-studio-900 border border-slate-700 text-white px-3.5 py-2.5 rounded-2xl shadow-2xl text-xs flex items-center gap-2 transform translate-y-24 opacity-0 transition duration-300 z-50 pointer-events-none">
+        <i id="toastIcon" class="fa-solid fa-check text-emerald-400 text-sm"></i>
+        <span id="toastText" class="font-bold">تم بنجاح!</span>
+    </div>
+
+    <script>
+        // High resolution square canvas coordinates
+        const CANVAS_DIM = 480;
+
+        let paintCanvas, onionCanvas;
+        let pCtx, oCtx;
+
+        // Frames Management: array of data URLs (PNG with white or transparent background)
+        let frames = [];
+        let currentFrameIndex = 0;
+        let undoHistory = [];
+
+        // Tool state
+        let currentTool = 'brush'; // 'brush', 'bucket', 'eraser'
+        let currentColor = '#000000'; // Default black outline
+        let brushSize = 6;
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        // Playback state
+        let isPlaying = false;
+        let playIntervalId = null;
+        let fps = 6;
+
+        // Web Audio Context for fun kid sound effects
+        let audioCtx = null;
+
+        function playSound(type) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+                if (type === 'pop') {
+                    osc.frequency.setValueAtTime(450, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'fill') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(260, now);
+                    osc.frequency.exponentialRampToValueAtTime(520, now + 0.15);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'magic') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(520, now);
+                    osc.frequency.exponentialRampToValueAtTime(1040, now + 0.25);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                }
+            } catch (e) {
+                // Audio silent fallback
+            }
+        }
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            initCanvases();
+            initStoredKey();
+            setupCanvasEvents();
+
+            // Start with a clean white base frame
+            createInitialBlankFrame();
+            renderTimelineStrip();
+            showToast("أهلاً بك يا باسم في استوديو الأنميشن الخاص بك!", "paintbrush");
+        });
+
+        function initCanvases() {
+            paintCanvas = document.getElementById('paintCanvas');
+            onionCanvas = document.getElementById('onionCanvas');
+
+            paintCanvas.width = CANVAS_DIM;
+            paintCanvas.height = CANVAS_DIM;
+            onionCanvas.width = CANVAS_DIM;
+            onionCanvas.height = CANVAS_DIM;
+
+            pCtx = paintCanvas.getContext('2d', { willReadFrequently: true });
+            oCtx = onionCanvas.getContext('2d');
+
+            pCtx.lineCap = 'round';
+            pCtx.lineJoin = 'round';
+            oCtx.lineCap = 'round';
+            oCtx.lineJoin = 'round';
+        }
+
+        function createInitialBlankFrame() {
+            const temp = document.createElement('canvas');
+            temp.width = CANVAS_DIM;
+            temp.height = CANVAS_DIM;
+            const ctx = temp.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, CANVAS_DIM, CANVAS_DIM);
+            frames.push(temp.toDataURL('image/png'));
+            loadFrame(0);
+        }
+
+        function setupCanvasEvents() {
+            // Touch Handlers
+            paintCanvas.addEventListener('touchstart', onTouchStart, { passive: false });
+            paintCanvas.addEventListener('touchmove', onTouchMove, { passive: false });
+            paintCanvas.addEventListener('touchend', onTouchEnd, { passive: false });
+            paintCanvas.addEventListener('touchcancel', onTouchEnd, { passive: false });
+
+            // Mouse Handlers
+            paintCanvas.addEventListener('mousedown', onMouseDown);
+            paintCanvas.addEventListener('mousemove', onMouseMove);
+            paintCanvas.addEventListener('mouseup', onMouseUp);
+            paintCanvas.addEventListener('mouseleave', onMouseUp);
+
+            // Onion skin toggle
+            document.getElementById('onionSkinToggle').addEventListener('change', refreshOnionSkin);
+        }
+
+        function getCanvasPoint(evt) {
+            const rect = paintCanvas.getBoundingClientRect();
+            const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+            const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+
+            const scaleX = paintCanvas.width / rect.width;
+            const scaleY = paintCanvas.height / rect.height;
+
+            return {
+                x: Math.round((clientX - rect.left) * scaleX),
+                y: Math.round((clientY - rect.top) * scaleY)
+            };
+        }
+
+        function onTouchStart(e) {
+            e.preventDefault();
+            if (isPlaying) stopPlayback();
+            const pt = getCanvasPoint(e);
+
+            if (currentTool === 'bucket') {
+                performFloodFill(pt.x, pt.y);
+            } else {
+                beginStroke(pt.x, pt.y);
+            }
+        }
+
+        function onTouchMove(e) {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const pt = getCanvasPoint(e);
+            drawStroke(pt.x, pt.y);
+        }
+
+        function onTouchEnd(e) {
+            e.preventDefault();
+            finishStroke();
+        }
+
+        function onMouseDown(e) {
+            if (isPlaying) stopPlayback();
+            const pt = getCanvasPoint(e);
+
+            if (currentTool === 'bucket') {
+                performFloodFill(pt.x, pt.y);
+            } else {
+                beginStroke(pt.x, pt.y);
+            }
+        }
+
+        function onMouseMove(e) {
+            if (!isDrawing) return;
+            const pt = getCanvasPoint(e);
+            drawStroke(pt.x, pt.y);
+        }
+
+        function onMouseUp() {
+            finishStroke();
+        }
+
+        function beginStroke(x, y) {
+            isDrawing = true;
+            lastX = x;
+            lastY = y;
+            pushUndo();
+
+            // Draw initial dot for fast taps
+            pCtx.beginPath();
+            pCtx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+            pCtx.fillStyle = currentTool === 'eraser' ? '#ffffff' : currentColor;
+            pCtx.fill();
+        }
+
+        function drawStroke(x, y) {
+            if (!isDrawing) return;
+
+            pCtx.beginPath();
+            pCtx.moveTo(lastX, lastY);
+            pCtx.lineTo(x, y);
+
+            if (currentTool === 'eraser') {
+                pCtx.strokeStyle = '#ffffff';
+                pCtx.lineWidth = brushSize * 2.5;
+            } else {
+                pCtx.strokeStyle = currentColor;
+                pCtx.lineWidth = brushSize;
+            }
+
+            pCtx.stroke();
+            lastX = x;
+            lastY = y;
+        }
+
+        function finishStroke() {
+            if (!isDrawing) return;
+            isDrawing = false;
+            pCtx.closePath();
+            saveActiveFrame();
+            updateFilmstripThumbnail(currentFrameIndex);
+        }
+
+        function hexToRgba(hex) {
+            let clean = hex.replace('#', '');
+            if (clean.length === 3) {
+                clean = clean.split('').map(c => c + c).join('');
+            }
+            const num = parseInt(clean, 16);
+            return [
+                (num >> 16) & 255,
+                (num >> 8) & 255,
+                num & 255,
+                255
+            ];
+        }
+
+        function performFloodFill(startX, startY) {
+            if (startX < 0 || startX >= CANVAS_DIM || startY < 0 || startY >= CANVAS_DIM) return;
+
+            pushUndo();
+            playSound('fill');
+
+            const imgData = pCtx.getImageData(0, 0, CANVAS_DIM, CANVAS_DIM);
+            const data = imgData.data;
+
+            const targetColor = hexToRgba(currentColor);
+            const startIndex = (startY * CANVAS_DIM + startX) * 4;
+            const startR = data[startIndex];
+            const startG = data[startIndex + 1];
+            const startB = data[startIndex + 2];
+            const startA = data[startIndex + 3];
+
+            // If already the same color, no-op
+            if (
+                Math.abs(startR - targetColor[0]) < 10 &&
+                Math.abs(startG - targetColor[1]) < 10 &&
+                Math.abs(startB - targetColor[2]) < 10 &&
+                Math.abs(startA - targetColor[3]) < 10
+            ) {
+                return;
+            }
+
+            // Color match tolerance (helps fill near anti-aliased black line edges)
+            const tolerance = 45;
+
+            function matches(idx) {
+                const r = data[idx];
+                const g = data[idx + 1];
+                const b = data[idx + 2];
+                const a = data[idx + 3];
+
+                // Do not fill over dark outlines (lines stay intact)
+                if (r < 65 && g < 65 && b < 65 && a > 180) {
+                    return false;
+                }
+
+                return (
+                    Math.abs(r - startR) <= tolerance &&
+                    Math.abs(g - startG) <= tolerance &&
+                    Math.abs(b - startB) <= tolerance &&
+                    Math.abs(a - startA) <= tolerance
+                );
+            }
+
+            // 4-way BFS flood fill with typed array queue
+            const queue = [startX, startY];
+            const visited = new Uint8Array(CANVAS_DIM * CANVAS_DIM);
+
+            while (queue.length > 0) {
+                const cy = queue.pop();
+                const cx = queue.pop();
+
+                const pos = cy * CANVAS_DIM + cx;
+                if (visited[pos]) continue;
+                visited[pos] = 1;
+
+                const idx = pos * 4;
+                data[idx] = targetColor[0];
+                data[idx + 1] = targetColor[1];
+                data[idx + 2] = targetColor[2];
+                data[idx + 3] = targetColor[3];
+
+                // Check 4 neighbors
+                if (cx > 0) {
+                    const leftPos = cy * CANVAS_DIM + (cx - 1);
+                    if (!visited[leftPos] && matches(leftPos * 4)) {
+                        queue.push(cx - 1, cy);
+                    }
+                }
+                if (cx < CANVAS_DIM - 1) {
+                    const rightPos = cy * CANVAS_DIM + (cx + 1);
+                    if (!visited[rightPos] && matches(rightPos * 4)) {
+                        queue.push(cx + 1, cy);
+                    }
+                }
+                if (cy > 0) {
+                    const upPos = (cy - 1) * CANVAS_DIM + cx;
+                    if (!visited[upPos] && matches(upPos * 4)) {
+                        queue.push(cx, cy - 1);
+                    }
+                }
+                if (cy < CANVAS_DIM - 1) {
+                    const downPos = (cy + 1) * CANVAS_DIM + cx;
+                    if (!visited[downPos] && matches(downPos * 4)) {
+                        queue.push(cx, cy + 1);
+                    }
+                }
+            }
+
+            pCtx.putImageData(imgData, 0, 0);
+            saveActiveFrame();
+            updateFilmstripThumbnail(currentFrameIndex);
+        }
+
+        function selectTool(tool) {
+            currentTool = tool;
+            playSound('pop');
+
+            const brushBtn = document.getElementById('btnToolBrush');
+            const bucketBtn = document.getElementById('btnToolBucket');
+            const eraserBtn = document.getElementById('btnToolEraser');
+
+            // Reset classes
+            brushBtn.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1 transition active:scale-95";
+            bucketBtn.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1 transition active:scale-95";
+            eraserBtn.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1 transition active:scale-95";
+
+            if (tool === 'brush') {
+                brushBtn.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white flex items-center gap-1 transition active:scale-95 shadow";
+            } else if (tool === 'bucket') {
+                bucketBtn.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold bg-amber-600 text-white flex items-center gap-1 transition active:scale-95 shadow";
+                showToast("اضغط داخل أي مساحة بيضاء أو ملونة لتلوينها بالسطل!", "fill-drip");
+            } else if (tool === 'eraser') {
+                eraserBtn.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold bg-rose-600 text-white flex items-center gap-1 transition active:scale-95 shadow";
+            }
+        }
+
+        function setColor(hex) {
+            currentColor = hex;
+            document.getElementById('nativeColorPicker').value = hex;
+            playSound('pop');
+            if (currentTool === 'eraser') {
+                selectTool('brush');
+            }
+        }
+
+        function setBrushSize(size) {
+            brushSize = parseInt(size, 10);
+            document.getElementById('brushSizeVal').innerText = brushSize;
+        }
+
+        function pushUndo() {
+            if (undoHistory.length >= 15) undoHistory.shift();
+            undoHistory.push(pCtx.getImageData(0, 0, CANVAS_DIM, CANVAS_DIM));
+        }
+
+        function undo() {
+            if (undoHistory.length > 0) {
+                playSound('pop');
+                const prev = undoHistory.pop();
+                pCtx.putImageData(prev, 0, 0);
+                saveActiveFrame();
+                updateFilmstripThumbnail(currentFrameIndex);
+            } else {
+                showToast("لا توجد حركات سابقة للتراجع عنها", "rotate-left");
+            }
+        }
+
+        function clearCurrentCanvas() {
+            pushUndo();
+            playSound('pop');
+            pCtx.fillStyle = '#ffffff';
+            pCtx.fillRect(0, 0, CANVAS_DIM, CANVAS_DIM);
+            saveActiveFrame();
+            updateFilmstripThumbnail(currentFrameIndex);
+            showToast("تم تنظيف الفريم بالكامل باللون الأبيض", "trash-can");
+        }
+
+        function saveActiveFrame() {
+            frames[currentFrameIndex] = paintCanvas.toDataURL('image/png');
+        }
+
+        function loadFrame(index) {
+            currentFrameIndex = index;
+            undoHistory = [];
+
+            const img = new Image();
+            img.onload = () => {
+                pCtx.clearRect(0, 0, CANVAS_DIM, CANVAS_DIM);
+                pCtx.drawImage(img, 0, 0);
+                refreshOnionSkin();
+            };
+            img.src = frames[index];
+
+            updateFrameCounters();
+            highlightCurrentThumb(index);
+        }
+
+        function refreshOnionSkin() {
+            oCtx.clearRect(0, 0, CANVAS_DIM, CANVAS_DIM);
+            const isEnabled = document.getElementById('onionSkinToggle').checked;
+
+            if (!isEnabled || currentFrameIndex === 0) return;
+
+            const prevData = frames[currentFrameIndex - 1];
+            if (!prevData) return;
+
+            const img = new Image();
+            img.onload = () => {
+                oCtx.clearRect(0, 0, CANVAS_DIM, CANVAS_DIM);
+                oCtx.drawImage(img, 0, 0);
+            };
+            img.src = prevData;
+        }
+
+        function addNewBlankFrame() {
+            saveActiveFrame();
+            playSound('pop');
+
+            const temp = document.createElement('canvas');
+            temp.width = CANVAS_DIM;
+            temp.height = CANVAS_DIM;
+            const ctx = temp.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, CANVAS_DIM, CANVAS_DIM);
+
+            frames.push(temp.toDataURL('image/png'));
+            currentFrameIndex = frames.length - 1;
+
+            renderTimelineStrip();
+            loadFrame(currentFrameIndex);
+            showToast("تمت إضافة فريم جديد فارغ", "plus");
+        }
+
+        function duplicateCurrentFrame() {
+            saveActiveFrame();
+            playSound('magic');
+
+            const currentData = frames[currentFrameIndex];
+            frames.splice(currentFrameIndex + 1, 0, currentData);
+            currentFrameIndex++;
+
+            renderTimelineStrip();
+            loadFrame(currentFrameIndex);
+            showToast("تم تكرار الفريم! عدّل الآن الحركة الصغيرة لتصنع الأنميشن", "copy");
+        }
+
+        function deleteCurrentFrame() {
+            if (frames.length <= 1) {
+                showToast("يجب أن يحتوي الأنميشن على فريم واحد على الأقل!", "triangle-exclamation");
+                return;
+            }
+
+            playSound('pop');
+            frames.splice(currentFrameIndex, 1);
+            if (currentFrameIndex >= frames.length) {
+                currentFrameIndex = frames.length - 1;
+            }
+
+            renderTimelineStrip();
+            loadFrame(currentFrameIndex);
+            showToast("تم حذف الفريم", "trash");
+        }
+
+        function stepFrame(delta) {
+            if (isPlaying) stopPlayback();
+            saveActiveFrame();
+            const target = currentFrameIndex + delta;
+            if (target >= 0 && target < frames.length) {
+                loadFrame(target);
+            } else if (target >= frames.length) {
+                addNewBlankFrame();
+            }
+        }
+
+        function updateFrameCounters() {
+            document.getElementById('currentFrameDisplay').innerText = currentFrameIndex + 1;
+            document.getElementById('totalFramesDisplay').innerText = frames.length;
+        }
+
+        function renderTimelineStrip() {
+            const container = document.getElementById('framesStrip');
+            container.innerHTML = '';
+
+            frames.forEach((frameData, idx) => {
+                const card = document.createElement('div');
+                card.id = `thumb-card-${idx}`;
+                card.className = `relative shrink-0 w-14 h-14 rounded-xl border-2 cursor-pointer overflow-hidden transition active:scale-95 ${
+                    idx === currentFrameIndex ? 'border-rose-500 scale-105 shadow-md shadow-rose-500/25' : 'border-slate-800 bg-white/90 opacity-60 hover:opacity-100'
+                }`;
+
+                card.onclick = () => {
+                    if (isPlaying) stopPlayback();
+                    saveActiveFrame();
+                    loadFrame(idx);
+                };
+
+                const img = document.createElement('img');
+                img.id = `thumb-img-${idx}`;
+                img.src = frameData;
+                img.className = 'w-full h-full object-cover';
+
+                const badge = document.createElement('span');
+                badge.className = 'absolute bottom-0.5 right-0.5 bg-black/80 text-[9px] text-white font-mono px-1 rounded';
+                badge.innerText = idx + 1;
+
+                card.appendChild(img);
+                card.appendChild(badge);
+                container.appendChild(card);
+            });
+        }
+
+        function updateFilmstripThumbnail(idx) {
+            const img = document.getElementById(`thumb-img-${idx}`);
+            if (img) img.src = frames[idx];
+        }
+
+        function highlightCurrentThumb(activeIdx) {
+            document.querySelectorAll('#framesStrip > div').forEach((card, idx) => {
+                if (idx === activeIdx) {
+                    card.className = 'relative shrink-0 w-14 h-14 rounded-xl border-2 border-rose-500 scale-105 shadow-md shadow-rose-500/25 cursor-pointer overflow-hidden transition';
+                    card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                } else {
+                    card.className = 'relative shrink-0 w-14 h-14 rounded-xl border-2 border-slate-800 bg-white/90 opacity-60 hover:opacity-100 cursor-pointer overflow-hidden transition';
+                }
+            });
+        }
+
+        function togglePlayback() {
+            if (isPlaying) {
+                stopPlayback();
+            } else {
+                startPlayback();
+            }
+        }
+
+        function startPlayback() {
+            if (frames.length < 2) {
+                showToast("اصنع أو كرّر فريمين على الأقل لتشاهد الحركة!", "film");
+                return;
+            }
+
+            saveActiveFrame();
+            isPlaying = true;
+
+            document.getElementById('btnPlay').className = "px-3.5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-md shadow-rose-600/30 transition";
+            document.getElementById('playIcon').className = "fa-solid fa-pause text-xs";
+            document.getElementById('playLabel').innerText = "إيقاف";
+            document.getElementById('playingBadge').classList.remove('hidden');
+            document.getElementById('playingBadge').classList.add('inline-flex');
+
+            // سحب الشاشة للأعلى بنعومة لرؤية الرسمة أثناء التشغيل
+            const canvasElem = document.getElementById('paintCanvas');
+            if (canvasElem) {
+                canvasElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            // Hide onion skin during playback
+            oCtx.clearRect(0, 0, CANVAS_DIM, CANVAS_DIM);
+
+            let playIdx = 0;
+            const intervalMs = Math.round(1000 / fps);
+
+            playIntervalId = setInterval(() => {
+                const img = new Image();
+                img.onload = () => {
+                    pCtx.clearRect(0, 0, CANVAS_DIM, CANVAS_DIM);
+                    pCtx.drawImage(img, 0, 0);
+                };
+                img.src = frames[playIdx];
+
+                document.getElementById('currentFrameDisplay').innerText = playIdx + 1;
+                highlightCurrentThumb(playIdx);
+
+                playIdx = (playIdx + 1) % frames.length;
+            }, intervalMs);
+        }
+
+        function stopPlayback() {
+            if (!isPlaying) return;
+            isPlaying = false;
+            clearInterval(playIntervalId);
+            playIntervalId = null;
+
+            document.getElementById('btnPlay').className = "px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition";
+            document.getElementById('playIcon').className = "fa-solid fa-play text-xs";
+            document.getElementById('playLabel').innerText = "تشغيل";
+            document.getElementById('playingBadge').classList.add('hidden');
+            document.getElementById('playingBadge').classList.remove('inline-flex');
+
+            loadFrame(currentFrameIndex);
+        }
+
+        function updateFPS(val) {
+            fps = parseInt(val, 10);
+            document.getElementById('fpsNum').innerText = fps;
+            if (isPlaying && playIntervalId) {
+                // تعديل سرعة المؤقت فورا بدون إيقاف أو إعادة الفريم
+                clearInterval(playIntervalId);
+                const intervalMs = Math.round(1000 / fps);
+                let playIdx = currentFrameIndex;
+                playIntervalId = setInterval(() => {
+                    const img = new Image();
+                    img.onload = () => {
+                        pCtx.clearRect(0, 0, CANVAS_DIM, CANVAS_DIM);
+                        pCtx.drawImage(img, 0, 0);
+                    };
+                    img.src = frames[playIdx];
+                    document.getElementById("currentFrameDisplay").innerText = playIdx + 1;
+                    highlightCurrentThumb(playIdx);
+                    playIdx = (playIdx + 1) % frames.length;
+                }, intervalMs);
+            }
+        }
+
+        function openAIModal() {
+            playSound('magic');
+            toggleModal('aiModal');
+        }
+
+        function closeAIModal() {
+            toggleModal('aiModal');
+        }
+
+        function setPromptIdea(text) {
+            document.getElementById('aiCharacterPrompt').value = text;
+            playSound('pop');
+        }
+
+        function initStoredKey() {
+            const key = localStorage.getItem('basim_gemini_api_key');
+            if (key) {
+                document.getElementById('userApiKeyInput').value = key;
+            }
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('userApiKeyInput').value.trim();
+            if (key) {
+                localStorage.setItem('basim_gemini_api_key', key);
+                showToast("تم حفظ مفتاح Gemini بنجاح!", "key");
+            } else {
+                localStorage.removeItem('basim_gemini_api_key');
+                showToast("تم مسح المفتاح (التطبيق سيعمل بالوضع الذكي)", "circle-info");
+            }
+        }
+
+        async function requestAILineArt() {
+            const prompt = document.getElementById('aiCharacterPrompt').value.trim();
+            if (!prompt) {
+                showToast("اكتب اسم الشخصية أو فكرتها أولاً يا باسم!", "pen");
+                return;
+            }
+
+            const btn = document.getElementById('btnGenerateAI');
+            const logBox = document.getElementById('aiLogBox');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> يرسم...`;
+
+            logBox.innerHTML = `
+                <div class="py-4 text-center">
+                    <i class="fa-solid fa-wand-magic-sparkles text-2xl text-rose-400 animate-bounce mb-2"></i>
+                    <p class="font-extrabold text-white text-xs">جاري الاتصال بـ Gemini AI لتوليد خطوط الشخصية...</p>
+                    <p class="text-[11px] text-slate-400 mt-1">يتم تصميم خطوط سوداء نقية مغلقة (Line-Art SVG) قابلة للتلوين بالسطل.</p>
+                </div>
+            `;
+
+            closeAIModal();
+            document.getElementById('canvasLoader').classList.remove('hidden');
+            document.getElementById('canvasLoader').classList.add('flex');
+
+            try {
+                const response = await fetch("/api/generate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server returned status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (result.svgText) {
+                    renderSvgToCanvas(result.svgText, prompt);
+                currentProjectName = prompt;
+                currentProjectId = "proj_" + Date.now();
+                setTimeout(() => { saveCurrentProject(prompt); }, 600);
+                } else {
+                    renderFallbackCharacter(prompt);
+                }
+            } catch (err) {
+                console.warn("API generate error, fallback to default character:", err);
+                renderFallbackCharacter(prompt);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-sparkles text-amber-300"></i><span>ارسمها لي</span>`;
+                document.getElementById('canvasLoader').classList.add('hidden');
+                document.getElementById('canvasLoader').classList.remove('flex');
+            }
+        }
+
+        // Render SVG Vector Art onto the Canvas
+        function renderSvgToCanvas(svgMarkup, characterTitle) {
+            pushUndo();
+            const blob = new Blob([svgMarkup], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const img = new Image();
+
+            img.onload = () => {
+                pCtx.fillStyle = '#ffffff';
+                pCtx.fillRect(0, 0, CANVAS_DIM, CANVAS_DIM);
+                pCtx.drawImage(img, 0, 0, CANVAS_DIM, CANVAS_DIM);
+                URL.revokeObjectURL(url);
+                saveActiveFrame();
+                updateFilmstripThumbnail(currentFrameIndex);
+                playSound('magic');
+                showToast(`🎉 تم رسم "${characterTitle}" بنجاح! لوّنها بالسطل الآن!`, "wand-magic-sparkles");
+            };
+            img.onerror = () => {
+                renderFallbackCharacter(characterTitle);
+            };
+            img.src = url;
+        }
+
+        // Built-in intelligent SVG line-art presets if API is offline or key not supplied
+        function renderFallbackCharacter(idea) {
+            pushUndo();
+            const lower = idea.toLowerCase();
+
+            // Default: Ninja Robot
+            let svg = `
+            <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                <!-- Ninja Robot -->
+                <!-- Head -->
+                <rect x="150" y="80" width="200" height="150" rx="40" fill="#ffffff" stroke="#000000" stroke-width="8"/>
+                <!-- Ninja Visor -->
+                <rect x="170" y="125" width="160" height="45" rx="15" fill="#ffffff" stroke="#000000" stroke-width="7"/>
+                <!-- Robot Eyes -->
+                <circle cx="210" cy="147" r="12" fill="#ffffff" stroke="#000000" stroke-width="5"/>
+                <circle cx="290" cy="147" r="12" fill="#ffffff" stroke="#000000" stroke-width="5"/>
+                <!-- Antennas -->
+                <line x1="250" y1="80" x2="250" y2="40" stroke="#000000" stroke-width="8" stroke-linecap="round"/>
+                <circle cx="250" cy="30" r="14" fill="#ffffff" stroke="#000000" stroke-width="7"/>
+                <!-- Headband knot -->
+                <path d="M 350 140 Q 400 120 420 150 Q 390 160 350 155 Z" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+                <!-- Body -->
+                <rect x="170" y="240" width="160" height="150" rx="30" fill="#ffffff" stroke="#000000" stroke-width="8"/>
+                <!-- Chest symbol -->
+                <circle cx="250" cy="305" r="30" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+                <polygon points="250,285 260,305 240,305" fill="#ffffff" stroke="#000000" stroke-width="5"/>
+                <!-- Arms -->
+                <path d="M 170 260 Q 110 300 130 360" fill="none" stroke="#000000" stroke-width="12" stroke-linecap="round"/>
+                <path d="M 330 260 Q 390 280 400 340" fill="none" stroke="#000000" stroke-width="12" stroke-linecap="round"/>
+                <!-- Ninja Sword -->
+                <line x1="390" y1="230" x2="420" y2="420" stroke="#000000" stroke-width="9" stroke-linecap="round"/>
+                <rect x="380" y="320" width="50" height="15" rx="5" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+                <!-- Legs -->
+                <rect x="195" y="390" width="40" height="70" rx="15" fill="#ffffff" stroke="#000000" stroke-width="8"/>
+                <rect x="265" y="390" width="40" height="70" rx="15" fill="#ffffff" stroke="#000000" stroke-width="8"/>
+            </svg>`;
+
+            if (lower.includes('فهد') || lower.includes('cat') || lower.includes('space') || lower.includes('خوذة')) {
+                // Space Cheetah
+                svg = `
+                <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Space Helmet Bubble -->
+                    <circle cx="250" cy="180" r="140" fill="#ffffff" stroke="#000000" stroke-width="9"/>
+                    <!-- Cheetah Head Inside -->
+                    <circle cx="250" cy="185" r="85" fill="#ffffff" stroke="#000000" stroke-width="7"/>
+                    <!-- Ears -->
+                    <polygon points="180,120 210,135 185,155" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+                    <polygon points="320,120 290,135 315,155" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+                    <!-- Big Eyes -->
+                    <ellipse cx="220" cy="180" rx="18" ry="24" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+                    <circle cx="222" cy="178" r="8" fill="#000000"/>
+                    <ellipse cx="280" cy="180" rx="18" ry="24" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+                    <circle cx="278" cy="178" r="8" fill="#000000"/>
+                    <!-- Snout -->
+                    <ellipse cx="250" cy="210" rx="14" ry="9" fill="#ffffff" stroke="#000000" stroke-width="5"/>
+                    <!-- Helmet base ring -->
+                    <rect x="180" y="300" width="140" height="30" rx="10" fill="#ffffff" stroke="#000000" stroke-width="7"/>
+                    <!-- Space Suit Body -->
+                    <path d="M 180 330 Q 150 440 200 450 L 300 450 Q 350 440 320 330 Z" fill="#ffffff" stroke="#000000" stroke-width="8"/>
+                    <!-- Chest Pack -->
+                    <rect x="215" y="350" width="70" height="50" rx="12" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+                    <!-- Tail -->
+                    <path d="M 180 430 Q 100 420 120 340" fill="none" stroke="#000000" stroke-width="12" stroke-linecap="round"/>
+                </svg>`;
+            } else if (lower.includes('ديناصور') || lower.includes('dino')) {
+                // Cute Dino
+                svg = `
+                <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Dino Head & Body -->
+                    <path d="M 230 110 Q 340 100 350 180 Q 350 250 290 260 Q 320 370 280 430 L 190 430 Q 150 370 170 250 Q 150 180 230 110 Z" fill="#ffffff" stroke="#000000" stroke-width="8"/>
+                    <!-- Eye -->
+                    <circle cx="290" cy="165" r="22" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+                    <circle cx="295" cy="165" r="9" fill="#000000"/>
+                    <!-- Spikes on back -->
+                    <polygon points="170,220 130,230 165,250" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+                    <polygon points="160,280 120,295 160,315" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+                    <polygon points="165,340 130,360 170,375" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+                    <!-- Cute Small Arms -->
+                    <path d="M 270 270 Q 310 275 300 295" fill="none" stroke="#000000" stroke-width="8" stroke-linecap="round"/>
+                    <!-- Tail -->
+                    <path d="M 175 400 Q 80 410 70 340" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round"/>
+                    <!-- Feet -->
+                    <ellipse cx="205" cy="440" rx="30" ry="15" fill="#ffffff" stroke="#000000" stroke-width="7"/>
+                    <ellipse cx="275" cy="440" rx="30" ry="15" fill="#ffffff" stroke="#000000" stroke-width="7"/>
+                </svg>`;
+            }
+
+            renderSvgToCanvas(svg, idea);
+        }
+
+        function exportAnimationGif() {
+            if (isPlaying) stopPlayback();
+            saveActiveFrame();
+
+            if (frames.length < 2) {
+                showToast("كرّر الفريم واصنع حركة صغيرة حتى نصدّر GIF مميز!", "triangle-exclamation");
+                return;
+            }
+
+            toggleModal('exportModal');
+            document.getElementById('exportModalTitle').innerText = "جاري تصدير أنميشن باسم...";
+            document.getElementById('exportSpinner').classList.remove('hidden');
+            document.getElementById('exportPreviewArea').classList.add('hidden');
+            document.getElementById('btnDownloadGif').classList.add('hidden');
+            document.getElementById('exportSubtitle').innerText = "بنجمع فريمات باسم الكرتونية في ملف GIF جاهز للمشاركة!";
+
+            gifshot.createGIF({
+                images: frames,
+                gifWidth: 340,
+                gifHeight: 340,
+                interval: 1 / fps,
+                numFrames: frames.length,
+                frameDuration: 1,
+                sampleInterval: 10,
+                progressCallback: function(progress) {
+                    document.getElementById('exportModalTitle').innerText = `جاري التصدير: ${Math.round(progress * 100)}%`;
+                }
+            }, function(obj) {
+                if (!obj.error) {
+                    const animatedImage = obj.image;
+                    document.getElementById('exportSpinner').classList.add('hidden');
+                    document.getElementById('exportPreviewArea').classList.remove('hidden');
+                    
+                    const resultImg = document.getElementById('exportResultImg');
+                    resultImg.src = animatedImage;
+
+                    const downloadBtn = document.getElementById('btnDownloadGif');
+                    downloadBtn.href = animatedImage;
+                    downloadBtn.classList.remove('hidden');
+                    downloadBtn.classList.add('inline-flex');
+
+                    document.getElementById('exportModalTitle').innerText = "🎉 مبروك يا فنان باسم! فيلمك الكرتوني جاهز";
+                    document.getElementById('exportSubtitle').innerText = "اضغط على 'حفظ في الهاتف' ليصبح في ألبوم الصور فوراً!";
+                    playSound('magic');
+                } else {
+                    document.getElementById('exportSpinner').classList.add('hidden');
+                    document.getElementById('exportModalTitle').innerText = "عذراً، حدث خطأ أثناء التصدير";
+                    document.getElementById('exportSubtitle').innerText = "تأكد من رسم فريم إضافي والمحاولة مجدداً.";
+                }
+            });
+        }
+
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.toggle('hidden');
+        }
+
+        function showToast(text, icon = "check") {
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toastText');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastText.innerText = text;
+            toastIcon.className = `fa-solid fa-${icon} text-amber-400 text-sm`;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3200);
+        }
+    </script>
+
+        <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js").catch(console.error);
+        });
+      }
+    </script>
+
+    <!-- Projects Modal -->
+    <div id="projectsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-studio-900 border border-slate-700/80 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-studio-800/50">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-folder-open text-indigo-400 text-lg"></i>
+                    <h3 class="font-extrabold text-white text-base">معرض مشاريع باسم 🎨</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-bold text-white cursor-pointer transition">
+                        <i class="fa-solid fa-file-import ml-1"></i> استيراد ملف .basim
+                        <input type="file" accept=".basim,.json" onchange="importProjectFile(event)" class="hidden">
+                    </label>
+                    <button onclick="closeProjectsModal()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="projectsListContainer" class="p-6 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <!-- بطاقات المشاريع تُولد بالجافاسكريبت -->
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // دالة إضافة نص على الكانفاس لباسم ورندة
+        // نظام النصوص التفاعلي لباسم ورندة (سحب، تكبير/تصغير، تثبيت)
+        let activeTextEl = null;
+
+        function addTextToCanvas() {
+            if (activeTextEl) removeActiveFloatingText();
+
+            const userText = prompt("اكتب النص أو الكلمة يا فنان:", "باسم ورندة 🌟");
+            if (!userText || !userText.trim()) return;
+
+            const container = paintCanvas.parentElement;
+            let currentFontSize = 32;
+
+            // إنشاء الحاوية العائمة للنص
+            const wrapper = document.createElement("div");
+            wrapper.id = "floatingTextWrapper";
+            wrapper.className = "absolute z-40 flex flex-col items-center select-none cursor-move";
+            wrapper.style.left = "50%";
+            wrapper.style.top = "50%";
+            wrapper.style.transform = "translate(-50%, -50%)";
+            wrapper.style.touchAction = "none";
+
+            // شريط أزرار التحكم بالنص (تكبير، تصغير، تثبيت، إلغاء)
+            const controls = document.createElement("div");
+            controls.className = "flex items-center gap-1 bg-slate-900/90 border border-slate-700 px-2 py-1 rounded-xl shadow-xl mb-1.5 backdrop-blur-sm pointer-events-auto";
+            controls.innerHTML = `
+                <button type="button" id="btnTextZoomIn" class="w-6 h-6 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-black flex items-center justify-center transition active:scale-90" title="تكبير">+</button>
+                <button type="button" id="btnTextZoomOut" class="w-6 h-6 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-black flex items-center justify-center transition active:scale-90" title="تصغير">-</button>
+                <button type="button" id="btnTextConfirm" class="px-2 h-6 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-black flex items-center gap-1 transition active:scale-90 shadow">✔️ تثبيت</button>
+                <button type="button" id="btnTextCancel" class="w-6 h-6 bg-rose-900/80 hover:bg-rose-600 text-white rounded-lg text-[10px] font-black flex items-center justify-center transition active:scale-90">✕</button>
+            `;
+
+            // العنصر المعروض للنص
+            const textDisplay = document.createElement("div");
+            textDisplay.id = "floatingTextLabel";
+            textDisplay.innerText = userText.trim();
+            textDisplay.style.fontSize = currentFontSize + "px";
+            textDisplay.style.color = currentColor;
+            textDisplay.className = "px-3 py-1 font-bold rounded-lg border-2 border-dashed border-indigo-400 bg-indigo-500/10 text-center drop-shadow-md transition-colors";
+            textDisplay.style.fontFamily = "'Cairo', sans-serif";
+
+            wrapper.appendChild(controls);
+            wrapper.appendChild(textDisplay);
+            container.appendChild(wrapper);
+            activeTextEl = wrapper;
+
+            // أزرار الحجم
+            controls.querySelector("#btnTextZoomIn").onclick = (e) => {
+                e.stopPropagation();
+                if (currentFontSize < 80) {
+                    currentFontSize += 4;
+                    textDisplay.style.fontSize = currentFontSize + "px";
+                }
+            };
+            controls.querySelector("#btnTextZoomOut").onclick = (e) => {
+                e.stopPropagation();
+                if (currentFontSize > 14) {
+                    currentFontSize -= 4;
+                    textDisplay.style.fontSize = currentFontSize + "px";
+                }
+            };
+
+            // زر الإلغاء
+            controls.querySelector("#btnTextCancel").onclick = (e) => {
+                e.stopPropagation();
+                removeActiveFloatingText();
+            };
+
+            // زر التثبيت وطباعة النص على الكانفاس
+            controls.querySelector("#btnTextConfirm").onclick = (e) => {
+                e.stopPropagation();
+                bakeTextToCanvas(userText.trim(), textDisplay, currentFontSize);
+            };
+
+            // منطق سحب النص (Touch & Mouse Drag)
+            let isDragging = false;
+            let startX = 0, startY = 0;
+            let initialLeft = 0, initialTop = 0;
+
+            function startDrag(clientX, clientY) {
+                isDragging = true;
+                const rect = wrapper.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                
+                // تحويل الموضع من translate إلى absolute coordinates
+                wrapper.style.transform = "none";
+                wrapper.style.left = (rect.left - containerRect.left) + "px";
+                wrapper.style.top = (rect.top - containerRect.top) + "px";
+
+                initialLeft = parseFloat(wrapper.style.left);
+                initialTop = parseFloat(wrapper.style.top);
+                startX = clientX;
+                startY = clientY;
+            }
+
+            function doDrag(clientX, clientY) {
+                if (!isDragging) return;
+                const dx = clientX - startX;
+                const dy = clientY - startY;
+                wrapper.style.left = (initialLeft + dx) + "px";
+                wrapper.style.top = (initialTop + dy) + "px";
+            }
+
+            function endDrag() {
+                isDragging = false;
+            }
+
+            textDisplay.addEventListener("touchstart", (e) => {
+                const t = e.touches[0];
+                startDrag(t.clientX, t.clientY);
+            }, { passive: true });
+
+            window.addEventListener("touchmove", (e) => {
+                if (isDragging && e.touches.length > 0) {
+                    doDrag(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: true });
+
+            window.addEventListener("touchend", endDrag);
+
+            textDisplay.addEventListener("mousedown", (e) => {
+                startDrag(e.clientX, e.clientY);
+            });
+
+            window.addEventListener("mousemove", (e) => {
+                if (isDragging) doDrag(e.clientX, e.clientY);
+            });
+
+            window.addEventListener("mouseup", endDrag);
+
+            showToast("اسحب النص لأي مكان، وتحكم بحجمه ثم اضغط تثبيت!", "hand");
+        }
+
+        function removeActiveFloatingText() {
+            if (activeTextEl && activeTextEl.parentElement) {
+                activeTextEl.parentElement.removeChild(activeTextEl);
+            }
+            activeTextEl = null;
+        }
+
+        function bakeTextToCanvas(text, labelEl, fontSizePx) {
+            const container = paintCanvas.parentElement;
+            const labelRect = labelEl.getBoundingClientRect();
+            const canvasRect = paintCanvas.getBoundingClientRect();
+
+            const scaleX = CANVAS_DIM / canvasRect.width;
+            const scaleY = CANVAS_DIM / canvasRect.height;
+
+            const textCenterX = (labelRect.left + labelRect.width / 2 - canvasRect.left) * scaleX;
+            const textCenterY = (labelRect.top + labelRect.height / 2 - canvasRect.top) * scaleY;
+            const scaledFontSize = Math.round(fontSizePx * scaleX);
+
+            pushUndo();
+            playSound("magic");
+
+            pCtx.save();
+            pCtx.font = `bold ${scaledFontSize}px 'Cairo', sans-serif`;
+            pCtx.fillStyle = currentColor;
+            pCtx.textAlign = "center";
+            pCtx.textBaseline = "middle";
+            pCtx.shadowColor = "rgba(0,0,0,0.4)";
+            pCtx.shadowBlur = 4;
+            pCtx.fillText(text, textCenterX, textCenterY);
+            pCtx.restore();
+
+            saveActiveFrame();
+            updateFilmstripThumbnail(currentFrameIndex);
+            removeActiveFloatingText();
+            showToast("تم تثبيت النص في مكانه بنجاح!", "check");
+        }
+
+
+        // دالة إضافة صورة خارجية من استوديو الجهاز
+        // نظام التحكم المرن بالصور لباسم ورندة (تحكّم حر بالطول والعرض + مقابض)
+        let activeImageWrapper = null;
+        let activeUploadedImg = null;
+        let currentImgWidth = 160;
+        let currentImgHeight = 160;
+        let currentImgRotation = 0;
+
+        function uploadImageToCanvas(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    if (activeImageWrapper) removeActiveFloatingImage();
+                    if (typeof removeActiveFloatingText === "function") removeActiveFloatingText();
+
+                    activeUploadedImg = img;
+                    const container = paintCanvas.parentElement;
+
+                    // المقاس الأولي
+                    const aspect = img.width / img.height;
+                    const baseW = Math.min(container.clientWidth * 0.55, 180);
+                    currentImgWidth = Math.round(baseW);
+                    currentImgHeight = Math.round(baseW / aspect);
+                    currentImgRotation = 0;
+
+                    const wrapper = document.createElement("div");
+                    wrapper.id = "floatingImgWrapper";
+                    wrapper.className = "absolute z-40 flex flex-col items-center select-none";
+                    wrapper.style.left = "50%";
+                    wrapper.style.top = "50%";
+                    wrapper.style.transform = "translate(-50%, -50%)";
+                    wrapper.style.touchAction = "none";
+
+                    // شريط أدوات غني بالأزرار (طول، عرض، تكبير كلي، تدوير، تثبيت)
+                    const toolbar = document.createElement("div");
+                    toolbar.className = "flex items-center gap-1 bg-slate-900/95 border border-slate-700 p-1 rounded-xl shadow-2xl mb-1 backdrop-blur-md";
+                    toolbar.innerHTML = `
+                        <div class="flex items-center gap-0.5 bg-slate-800/80 px-1 py-0.5 rounded-lg text-[10px] text-slate-300">
+                            <span>↔️</span>
+                            <button type="button" id="btnWPlus" class="w-5 h-5 bg-slate-700 active:scale-90 text-white rounded font-bold">+</button>
+                            <button type="button" id="btnWMinus" class="w-5 h-5 bg-slate-700 active:scale-90 text-white rounded font-bold">-</button>
+                        </div>
+                        <div class="flex items-center gap-0.5 bg-slate-800/80 px-1 py-0.5 rounded-lg text-[10px] text-slate-300">
+                            <span>↕️</span>
+                            <button type="button" id="btnHPlus" class="w-5 h-5 bg-slate-700 active:scale-90 text-white rounded font-bold">+</button>
+                            <button type="button" id="btnHMinus" class="w-5 h-5 bg-slate-700 active:scale-90 text-white rounded font-bold">-</button>
+                        </div>
+                        <button type="button" id="btnImgRotRight" class="w-6 h-6 bg-slate-800 text-amber-400 rounded-lg text-xs font-bold active:scale-90" title="تدوير">↻</button>
+                        <button type="button" id="btnImgConfirm" class="px-2 h-6 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[11px] font-black active:scale-90 shadow">✔️ تثبيت</button>
+                        <button type="button" id="btnImgCancel" class="w-6 h-6 bg-rose-900/80 text-white rounded-lg text-[11px] font-bold active:scale-90">✕</button>
+                    `;
+
+                    // صندوق الصورة مع مقابض في الزوايا
+                    const imgBox = document.createElement("div");
+                    imgBox.id = "floatingImgBox";
+                    imgBox.className = "relative p-0.5 rounded-lg border-2 border-dashed border-emerald-400 bg-emerald-500/10 cursor-move shadow-2xl";
+                    imgBox.style.width = currentImgWidth + "px";
+                    imgBox.style.height = currentImgHeight + "px";
+                    imgBox.style.transform = `rotate(${currentImgRotation}deg)`;
+
+                    const imgElement = document.createElement("img");
+                    imgElement.src = img.src;
+                    imgElement.className = "w-full h-full object-fill pointer-events-none rounded";
+
+                    // مقبض سحب بالزاوية اليمين تحت للتكبير الحر بالإصبع
+                    const cornerHandle = document.createElement("div");
+                    cornerHandle.className = "absolute -bottom-2 -left-2 w-6 h-6 bg-emerald-400 border-2 border-white rounded-full shadow-lg flex items-center justify-center text-[10px] text-slate-900 font-black cursor-se-resize touch-none";
+                    cornerHandle.innerHTML = "⤡";
+
+                    imgBox.appendChild(imgElement);
+                    imgBox.appendChild(cornerHandle);
+                    wrapper.appendChild(toolbar);
+                    wrapper.appendChild(imgBox);
+                    container.appendChild(wrapper);
+                    activeImageWrapper = wrapper;
+
+                    function updateImgBoxSize() {
+                        imgBox.style.width = currentImgWidth + "px";
+                        imgBox.style.height = currentImgHeight + "px";
+                        imgBox.style.transform = `rotate(${currentImgRotation}deg)`;
+                    }
+
+                    // التحكم بالعرض
+                    toolbar.querySelector("#btnWPlus").onclick = (ev) => {
+                        ev.stopPropagation();
+                        currentImgWidth = Math.min(currentImgWidth + 12, 440);
+                        updateImgBoxSize();
+                    };
+                    toolbar.querySelector("#btnWMinus").onclick = (ev) => {
+                        ev.stopPropagation();
+                        currentImgWidth = Math.max(currentImgWidth - 12, 30);
+                        updateImgBoxSize();
+                    };
+
+                    // التحكم بالطول (الارتفاع) لتعبئة الإطار بالكامل
+                    toolbar.querySelector("#btnHPlus").onclick = (ev) => {
+                        ev.stopPropagation();
+                        currentImgHeight = Math.min(currentImgHeight + 12, 440);
+                        updateImgBoxSize();
+                    };
+                    toolbar.querySelector("#btnHMinus").onclick = (ev) => {
+                        ev.stopPropagation();
+                        currentImgHeight = Math.max(currentImgHeight - 12, 30);
+                        updateImgBoxSize();
+                    };
+
+                    // الدوران
+                    toolbar.querySelector("#btnImgRotRight").onclick = (ev) => {
+                        ev.stopPropagation();
+                        currentImgRotation = (currentImgRotation + 15) % 360;
+                        updateImgBoxSize();
+                    };
+
+                    // تثبيت وإلغاء
+                    toolbar.querySelector("#btnImgCancel").onclick = (ev) => {
+                        ev.stopPropagation();
+                        removeActiveFloatingImage();
+                    };
+                    toolbar.querySelector("#btnImgConfirm").onclick = (ev) => {
+                        ev.stopPropagation();
+                        bakeImageToCanvas(imgBox);
+                    };
+
+                    // مقبض الزاوية للسحب المباشر بالإصبع
+                    let resizing = false;
+                    let rStartX = 0, rStartY = 0;
+                    let rStartW = 0, rStartH = 0;
+
+                    function startResize(cx, cy) {
+                        resizing = true;
+                        rStartX = cx;
+                        rStartY = cy;
+                        rStartW = currentImgWidth;
+                        rStartH = currentImgHeight;
+                    }
+
+                    cornerHandle.addEventListener("touchstart", (ev) => {
+                        ev.stopPropagation();
+                        const t = ev.touches[0];
+                        startResize(t.clientX, t.clientY);
+                    }, { passive: false });
+
+                    cornerHandle.addEventListener("mousedown", (ev) => {
+                        ev.stopPropagation();
+                        startResize(ev.clientX, ev.clientY);
+                    });
+
+                    // حركة سحب الصورة ككل
+                    let isDragging = false;
+                    let startX = 0, startY = 0;
+                    let initialLeft = 0, initialTop = 0;
+
+                    function startDrag(clientX, clientY) {
+                        isDragging = true;
+                        const rect = wrapper.getBoundingClientRect();
+                        const containerRect = container.getBoundingClientRect();
+
+                        wrapper.style.transform = "none";
+                        wrapper.style.left = (rect.left - containerRect.left) + "px";
+                        wrapper.style.top = (rect.top - containerRect.top) + "px";
+
+                        initialLeft = parseFloat(wrapper.style.left);
+                        initialTop = parseFloat(wrapper.style.top);
+                        startX = clientX;
+                        startY = clientY;
+                    }
+
+                    imgBox.addEventListener("touchstart", (ev) => {
+                        if (resizing) return;
+                        const t = ev.touches[0];
+                        startDrag(t.clientX, t.clientY);
+                    }, { passive: true });
+
+                    imgBox.addEventListener("mousedown", (ev) => {
+                        if (resizing) return;
+                        startDrag(ev.clientX, ev.clientY);
+                    });
+
+                    window.addEventListener("touchmove", (ev) => {
+                        if (resizing && ev.touches.length > 0) {
+                            const t = ev.touches[0];
+                            const dx = t.clientX - rStartX;
+                            const dy = t.clientY - rStartY;
+                            currentImgWidth = Math.max(30, rStartW - dx);
+                            currentImgHeight = Math.max(30, rStartH + dy);
+                            updateImgBoxSize();
+                        } else if (isDragging && ev.touches.length > 0) {
+                            const t = ev.touches[0];
+                            wrapper.style.left = (initialLeft + (t.clientX - startX)) + "px";
+                            wrapper.style.top = (initialTop + (t.clientY - startY)) + "px";
+                        }
+                    }, { passive: true });
+
+                    window.addEventListener("mousemove", (ev) => {
+                        if (resizing) {
+                            const dx = ev.clientX - rStartX;
+                            const dy = ev.clientY - rStartY;
+                            currentImgWidth = Math.max(30, rStartW - dx);
+                            currentImgHeight = Math.max(30, rStartH + dy);
+                            updateImgBoxSize();
+                        } else if (isDragging) {
+                            wrapper.style.left = (initialLeft + (ev.clientX - startX)) + "px";
+                            wrapper.style.top = (initialTop + (ev.clientY - startY)) + "px";
+                        }
+                    });
+
+                    window.addEventListener("touchend", () => { isDragging = false; resizing = false; });
+                    window.addEventListener("mouseup", () => { isDragging = false; resizing = false; });
+
+                    showToast("استخدم ↕️ لتطويل الصورة و ↔️ لعرضها لتطابق الإطار!", "image");
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = "";
+        }
+
+        function removeActiveFloatingImage() {
+            if (activeImageWrapper && activeImageWrapper.parentElement) {
+                activeImageWrapper.parentElement.removeChild(activeImageWrapper);
+            }
+            activeImageWrapper = null;
+            activeUploadedImg = null;
+        }
+
+        function bakeImageToCanvas(imgBoxEl) {
+            if (!activeUploadedImg) return;
+
+            const boxRect = imgBoxEl.getBoundingClientRect();
+            const canvasRect = paintCanvas.getBoundingClientRect();
+
+            const scaleX = CANVAS_DIM / canvasRect.width;
+            const scaleY = CANVAS_DIM / canvasRect.height;
+
+            const centerX = (boxRect.left + boxRect.width / 2 - canvasRect.left) * scaleX;
+            const centerY = (boxRect.top + boxRect.height / 2 - canvasRect.top) * scaleY;
+
+            const finalW = currentImgWidth * scaleX;
+            const finalH = currentImgHeight * scaleY;
+
+            pushUndo();
+            playSound("magic");
+
+            pCtx.save();
+            pCtx.translate(centerX, centerY);
+            pCtx.rotate((currentImgRotation * Math.PI) / 180);
+            pCtx.drawImage(activeUploadedImg, -finalW / 2, -finalH / 2, finalW, finalH);
+            pCtx.restore();
+
+            saveActiveFrame();
+            updateFilmstripThumbnail(currentFrameIndex);
+            removeActiveFloatingImage();
+            showToast("تم تثبيت الصورة داخل الإطار بنجاح!", "check");
+        }
+
+    </script>
+
 <script>
 let dubMediaRec = null;
 let dubAudioChunks = [];
@@ -411,58 +1960,43 @@ let dubAudioBlob = null;
 let dubAudioPlayer = new Audio();
 let dubAudioStream = null;
 let readyVideoFile = null;
-let dubState = 'idle'; // 'idle', 'recording', 'ready'
+let dubState = 'idle';
 
 function handleDubAction() {
-    if (dubState === 'idle') {
-        startDubbing();
-    } else if (dubState === 'recording') {
-        stopDubbingAndRender();
-    } else if (dubState === 'ready') {
-        triggerInstantWhatsAppShare();
-    }
+    if (dubState === 'idle') startDubbing();
+    else if (dubState === 'recording') stopDubbingAndRender();
+    else if (dubState === 'ready') triggerInstantWhatsAppShare();
 }
 
 async function startDubbing() {
-    // 1. حفظ ما رسمه باسم على الكانفاس حالياً لمنع أي فريم أبيض
     if (typeof saveActiveFrame === 'function') saveActiveFrame();
-
     if (!frames || frames.length === 0) {
-        showToast("ارسم فكرة أولاً على الكانفاس يا بطل!", "palette");
+        showToast("ارسم فكرة أولاً على الكانفاس!", "palette");
         return;
     }
-
     try {
         dubAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         dubAudioChunks = [];
         dubMediaRec = new MediaRecorder(dubAudioStream);
-        dubMediaRec.ondataavailable = e => { if (e.data.size > 0) dubAudioChunks.push(e.data); };
-
+        dubMediaRec.ondataavailable = e => { if (e.data && e.data.size > 0) dubAudioChunks.push(e.data); };
         dubMediaRec.start();
         dubState = 'recording';
 
         const btn = document.getElementById('btnDirectDub');
-        const txt = document.getElementById('dubText');
-        const dot = document.getElementById('dubDot');
-        
-        btn.className = "px-2.5 py-1.5 bg-rose-600 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 animate-pulse shadow-lg transition";
-        txt.innerText = "إنهاء ⏹️";
-        dot.className = "w-2 h-2 rounded-full bg-yellow-300 inline-block";
+        btn.className = "px-2.5 py-1.5 bg-rose-600 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 animate-pulse shadow transition";
+        document.getElementById('dubText').innerText = "إنهاء ⏹️";
+        document.getElementById('dubDot').className = "w-2 h-2 rounded-full bg-yellow-300 inline-block";
 
         if (!isPlaying) startPlayback();
-        showToast("🔴 جارٍ الحركة والتسجيل... تكلّم ودبلج الآن!", "microphone");
-
-    } catch (err) {
-        alert("يرجى إعطاء المتصفح إذن الميكروفون.");
+        showToast("🔴 جارٍ التسجيل... تكلّم ودبلج الآن!", "microphone");
+    } catch(err) {
+        alert("يرجى إعطاء صلاحية الميكروفون.");
     }
 }
 
 async function stopDubbingAndRender() {
     const btn = document.getElementById('btnDirectDub');
-    const txt = document.getElementById('dubText');
-    const dot = document.getElementById('dubDot');
-
-    txt.innerText = "⏳ بنجهز...";
+    document.getElementById('dubText').innerText = "⏳ بنجهز...";
     btn.className = "px-2.5 py-1.5 bg-slate-700 text-slate-300 rounded-xl text-xs font-black flex items-center gap-1 transition";
 
     stopPlayback();
@@ -470,37 +2004,29 @@ async function stopDubbingAndRender() {
     dubMediaRec.onstop = async () => {
         dubAudioBlob = new Blob(dubAudioChunks, { type: 'audio/webm' });
         dubAudioPlayer.src = URL.createObjectURL(dubAudioBlob);
-        
-        if (dubAudioStream) {
-            dubAudioStream.getTracks().forEach(t => t.stop());
-        }
+        if (dubAudioStream) dubAudioStream.getTracks().forEach(t => t.stop());
 
-        // تجهيز ملف الفيديو كاملاً بالخلفية الآن!
+        // نجهّز الفيديو في الخلفية الآن ليكون جاهزاً بنقرة واحدة
         await preRenderVideoFile();
 
-        // تحويل الزر إلى زر الواتساب الجاهز
         dubState = 'ready';
-        btn.className = "px-2.5 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-md shadow-emerald-500/30 transition animate-bounce";
-        txt.innerHTML = "واتساب 📲";
-        dot.className = "w-2 h-2 rounded-full bg-white inline-block";
+        btn.className = "px-2.5 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow transition";
+        document.getElementById('dubText').innerText = "واتساب 📲";
+        document.getElementById('dubDot').className = "w-2 h-2 rounded-full bg-white inline-block";
 
         document.getElementById('btnDubPreviewMini').classList.remove('hidden');
         document.getElementById('btnDubPreviewMini').classList.add('inline-flex');
         document.getElementById('btnDubResetMini').classList.remove('hidden');
         document.getElementById('btnDubResetMini').classList.add('inline-flex');
 
-        showToast("🎉 الفيديو والصوت جاهزان! اضغط 'واتساب' للإرسال فوراً", "check");
+        showToast("✅ اضغط 'واتساب' للإرسال فوراً", "check");
     };
 
-    if (dubMediaRec && dubMediaRec.state !== 'inactive') {
-        dubMediaRec.stop();
-    }
+    if (dubMediaRec && dubMediaRec.state !== 'inactive') dubMediaRec.stop();
 }
 
-// دمج الفريمات والصوت في ملف جاهز مسبقاً
 async function preRenderVideoFile() {
     if (typeof saveActiveFrame === 'function') saveActiveFrame();
-
     const loadedImgs = [];
     for (let f of frames) {
         const img = new Image();
@@ -508,7 +2034,6 @@ async function preRenderVideoFile() {
         await new Promise(r => { img.onload = r; img.onerror = r; });
         loadedImgs.push(img);
     }
-
     if (loadedImgs.length === 0) return;
 
     const expCanvas = document.createElement('canvas');
@@ -521,7 +2046,7 @@ async function preRenderVideoFile() {
     if (dubAudioBlob) {
         try {
             const actx = new (window.AudioContext || window.webkitAudioContext)();
-            if (actx.state === 'suspended') await actx.resume(); // فك تجميد الصوت للأندرويد
+            if (actx.state === 'suspended') await actx.resume();
             const ab = await dubAudioBlob.arrayBuffer();
             const audioBuf = await actx.decodeAudioData(ab);
             totalDuration = Math.max(audioBuf.duration, 2.0);
@@ -534,9 +2059,7 @@ async function preRenderVideoFile() {
 
             const aTrack = dest.stream.getAudioTracks()[0];
             if (aTrack) stream.addTrack(aTrack);
-        } catch(e) {
-            console.warn("Audio attach error:", e);
-        }
+        } catch(e) {}
     }
 
     let mimeType = 'video/webm';
@@ -556,7 +2079,6 @@ async function preRenderVideoFile() {
         };
 
         recorder.start();
-
         const currentFps = fps || 6;
         const frameInterval = 1000 / currentFps;
         const startT = performance.now();
@@ -569,41 +2091,33 @@ async function preRenderVideoFile() {
                 recorder.stop();
                 return;
             }
-
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, 480, 480);
-
             const idx = Math.floor(elapsed / frameInterval) % loadedImgs.length;
             ctx.drawImage(loadedImgs[idx], 0, 0, 480, 480);
         }, 1000 / 30);
     });
 }
 
-// فتح الواتساب فوراً بدون أي تأخير لأن الكبسة مباشرة
 async function triggerInstantWhatsAppShare() {
     if (!readyVideoFile) return;
-
     if (navigator.canShare && navigator.canShare({ files: [readyVideoFile] })) {
         try {
             await navigator.share({
                 files: [readyVideoFile],
                 title: 'كرتون باسم ورندا 🎬',
-                text: 'شوفوا فيلم الكرتون الناطق اللي دبلجناه!'
+                text: 'شوفوا فيلم الكرتون الجديد مع الصوت!'
             });
-            showToast("✅ تمت المشاركة في واتساب بنجاح!", "check");
+            showToast("✅ تمت المشاركة في واتساب!", "check");
             return;
-        } catch (err) {
-            console.log("تم إلغاء المشاركة أو إغلاقها");
-        }
+        } catch (e) {}
     }
-
-    // تنزيل كخيار احتياطي إذا لزم
     const url = URL.createObjectURL(readyVideoFile);
     const a = document.createElement('a');
     a.href = url;
     a.download = readyVideoFile.name;
     a.click();
-    showToast("✅ تم حفظ الفيديو في الهاتف!", "check");
+    showToast("✅ تم حفظ الفيديو بالهاتف!", "check");
 }
 
 function playDubPreview() {
@@ -611,9 +2125,7 @@ function playDubPreview() {
         dubAudioPlayer.currentTime = 0;
         dubAudioPlayer.play();
         if (!isPlaying) startPlayback();
-        dubAudioPlayer.onended = () => {
-            stopPlayback();
-        };
+        dubAudioPlayer.onended = () => stopPlayback();
     }
 }
 
@@ -622,20 +2134,12 @@ function resetDubAction() {
     dubAudioBlob = null;
     readyVideoFile = null;
     dubAudioPlayer.src = "";
-
     const btn = document.getElementById('btnDirectDub');
-    const txt = document.getElementById('dubText');
-    const dot = document.getElementById('dubDot');
-
-    btn.className = "px-2.5 py-1.5 bg-gradient-to-r from-rose-500 to-pink-600 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-md shadow-rose-500/30 transition";
-    txt.innerText = "سجّل 🎙️";
-    dot.className = "w-2 h-2 rounded-full bg-white inline-block";
-
+    btn.className = "px-2.5 py-1.5 bg-gradient-to-r from-rose-500 to-pink-600 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow transition";
+    document.getElementById('dubText').innerText = "سجّل 🎙️";
+    document.getElementById('dubDot').className = "w-2 h-2 rounded-full bg-white inline-block";
     document.getElementById('btnDubPreviewMini').classList.add('hidden');
-    document.getElementById('btnDubPreviewMini').classList.remove('inline-flex');
     document.getElementById('btnDubResetMini').classList.add('hidden');
-    document.getElementById('btnDubResetMini').classList.remove('inline-flex');
-
     showToast("جاهز لتسجيل دبلجة جديدة", "rotate-right");
 }
 </script>

@@ -4,3 +4,6 @@
 test_gemini.py
 *.bak
 .wrangler/
+
+.dev.vars
+index.html.bak
