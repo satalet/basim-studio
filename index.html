@@ -2101,23 +2101,28 @@ async function preRenderVideoFile() {
 
 async function triggerInstantWhatsAppShare() {
     if (!readyVideoFile) return;
-    if (navigator.canShare && navigator.canShare({ files: [readyVideoFile] })) {
+
+    // محاولة فتح قائمة المشاركة والواتساب مباشرة
+    if (navigator.share) {
         try {
             await navigator.share({
-                files: [readyVideoFile],
-                title: 'كرتون باسم ورندا 🎬',
-                text: 'شوفوا فيلم الكرتون الجديد مع الصوت!'
+                files: [readyVideoFile]
             });
-            showToast("✅ تمت المشاركة في واتساب!", "check");
+            showToast("✅ تمت المشاركة في واتساب بنجاح!", "check");
             return;
-        } catch (e) {}
+        } catch (err) {
+            if (err.name === 'AbortError') return; // إذا أغلق المستخدم النافذة لا نقوم بالتنزيل الإجباري
+            console.warn("Share error, falling back:", err);
+        }
     }
+
+    // تنزيل احتياطي في حال كان الجهاز قديماً جداً ولا يدعم Web Share
     const url = URL.createObjectURL(readyVideoFile);
     const a = document.createElement('a');
     a.href = url;
     a.download = readyVideoFile.name;
     a.click();
-    showToast("✅ تم حفظ الفيديو بالهاتف!", "check");
+    showToast("✅ تم حفظ الفيديو في الهاتف!", "check");
 }
 
 function playDubPreview() {
