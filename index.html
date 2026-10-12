@@ -326,7 +326,7 @@
         <div class="bg-studio-900 border border-slate-800 rounded-2xl p-2 sm:p-3 shadow-xl flex flex-col gap-2 w-full max-w-[min(440px,94vw)] mx-auto overflow-hidden">
             
             <!-- Tool selection row: متناسق تماماً بدون خروج -->
-            <div class="grid grid-cols-7 gap-1 w-full bg-studio-950 p-1.5 rounded-xl border border-slate-800/80">
+            <div class="grid grid-cols-7 gap-1 w-full bg-studio-950 p-1 rounded-xl border border-slate-800/80 overflow-hidden">
                 <button id="btnToolBrush" onclick="selectTool('brush')" class="py-1.5 rounded-lg text-[10px] font-bold bg-indigo-600 text-white flex flex-col items-center justify-center gap-0.5 transition active:scale-95">
                     <i class="fa-solid fa-paintbrush text-xs"></i>
                     <span>فرشاة</span>
@@ -1678,11 +1678,11 @@
 
 
         // دالة إضافة صورة خارجية من استوديو الجهاز
-        // نظام إدراج الصور التفاعلي لباسم ورندة (سحب، دوران، تكبير/تصغير، تثبيت)
+        // نظام التحكم المرن بالصور لباسم ورندة (تحكّم حر بالطول والعرض + مقابض)
         let activeImageWrapper = null;
         let activeUploadedImg = null;
-        let currentImgWidth = 140;
-        let currentImgHeight = 140;
+        let currentImgWidth = 160;
+        let currentImgHeight = 160;
         let currentImgRotation = 0;
 
         function uploadImageToCanvas(event) {
@@ -1699,19 +1699,13 @@
                     activeUploadedImg = img;
                     const container = paintCanvas.parentElement;
 
-                    // حساب المقاس الأولي للصورة ليتناسب مع الشاشة
+                    // المقاس الأولي
                     const aspect = img.width / img.height;
-                    const initBase = Math.min(container.clientWidth * 0.45, 160);
-                    if (aspect >= 1) {
-                        currentImgWidth = initBase;
-                        currentImgHeight = initBase / aspect;
-                    } else {
-                        currentImgHeight = initBase;
-                        currentImgWidth = initBase * aspect;
-                    }
+                    const baseW = Math.min(container.clientWidth * 0.55, 180);
+                    currentImgWidth = Math.round(baseW);
+                    currentImgHeight = Math.round(baseW / aspect);
                     currentImgRotation = 0;
 
-                    // الحاوية العائمة للصورة
                     const wrapper = document.createElement("div");
                     wrapper.id = "floatingImgWrapper";
                     wrapper.className = "absolute z-40 flex flex-col items-center select-none";
@@ -1720,87 +1714,121 @@
                     wrapper.style.transform = "translate(-50%, -50%)";
                     wrapper.style.touchAction = "none";
 
-                    // شريط أدوات التحكم (تكبير، تصغير، دوران، تثبيت، إلغاء)
+                    // شريط أدوات غني بالأزرار (طول، عرض، تكبير كلي، تدوير، تثبيت)
                     const toolbar = document.createElement("div");
-                    toolbar.className = "flex items-center gap-1 bg-slate-900/95 border border-slate-700 px-2 py-1 rounded-xl shadow-2xl mb-1.5 backdrop-blur-md";
+                    toolbar.className = "flex items-center gap-1 bg-slate-900/95 border border-slate-700 p-1 rounded-xl shadow-2xl mb-1 backdrop-blur-md";
                     toolbar.innerHTML = `
-                        <button type="button" id="btnImgZoomIn" class="w-6 h-6 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-black flex items-center justify-center active:scale-90" title="تكبير">+</button>
-                        <button type="button" id="btnImgZoomOut" class="w-6 h-6 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-black flex items-center justify-center active:scale-90" title="تصغير">-</button>
-                        <button type="button" id="btnImgRotLeft" class="w-6 h-6 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg text-xs font-black flex items-center justify-center active:scale-90" title="تدوير يسار">↺</button>
-                        <button type="button" id="btnImgRotRight" class="w-6 h-6 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg text-xs font-black flex items-center justify-center active:scale-90" title="تدوير يمين">↻</button>
-                        <button type="button" id="btnImgConfirm" class="px-2 h-6 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-black flex items-center gap-1 active:scale-90 shadow">✔️ تثبيت</button>
-                        <button type="button" id="btnImgCancel" class="w-6 h-6 bg-rose-900/80 hover:bg-rose-600 text-white rounded-lg text-[10px] font-black flex items-center justify-center active:scale-90">✕</button>
+                        <div class="flex items-center gap-0.5 bg-slate-800/80 px-1 py-0.5 rounded-lg text-[10px] text-slate-300">
+                            <span>↔️</span>
+                            <button type="button" id="btnWPlus" class="w-5 h-5 bg-slate-700 active:scale-90 text-white rounded font-bold">+</button>
+                            <button type="button" id="btnWMinus" class="w-5 h-5 bg-slate-700 active:scale-90 text-white rounded font-bold">-</button>
+                        </div>
+                        <div class="flex items-center gap-0.5 bg-slate-800/80 px-1 py-0.5 rounded-lg text-[10px] text-slate-300">
+                            <span>↕️</span>
+                            <button type="button" id="btnHPlus" class="w-5 h-5 bg-slate-700 active:scale-90 text-white rounded font-bold">+</button>
+                            <button type="button" id="btnHMinus" class="w-5 h-5 bg-slate-700 active:scale-90 text-white rounded font-bold">-</button>
+                        </div>
+                        <button type="button" id="btnImgRotRight" class="w-6 h-6 bg-slate-800 text-amber-400 rounded-lg text-xs font-bold active:scale-90" title="تدوير">↻</button>
+                        <button type="button" id="btnImgConfirm" class="px-2 h-6 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[11px] font-black active:scale-90 shadow">✔️ تثبيت</button>
+                        <button type="button" id="btnImgCancel" class="w-6 h-6 bg-rose-900/80 text-white rounded-lg text-[11px] font-bold active:scale-90">✕</button>
                     `;
 
-                    // عنصر عرض الصورة
+                    // صندوق الصورة مع مقابض في الزوايا
                     const imgBox = document.createElement("div");
                     imgBox.id = "floatingImgBox";
-                    imgBox.className = "p-1 rounded-xl border-2 border-dashed border-emerald-400 bg-emerald-500/10 cursor-move shadow-xl";
+                    imgBox.className = "relative p-0.5 rounded-lg border-2 border-dashed border-emerald-400 bg-emerald-500/10 cursor-move shadow-2xl";
                     imgBox.style.width = currentImgWidth + "px";
                     imgBox.style.height = currentImgHeight + "px";
                     imgBox.style.transform = `rotate(${currentImgRotation}deg)`;
-                    imgBox.style.transition = "transform 0.1s ease";
 
                     const imgElement = document.createElement("img");
                     imgElement.src = img.src;
-                    imgElement.className = "w-full h-full object-contain pointer-events-none rounded-lg";
+                    imgElement.className = "w-full h-full object-fill pointer-events-none rounded";
+
+                    // مقبض سحب بالزاوية اليمين تحت للتكبير الحر بالإصبع
+                    const cornerHandle = document.createElement("div");
+                    cornerHandle.className = "absolute -bottom-2 -left-2 w-6 h-6 bg-emerald-400 border-2 border-white rounded-full shadow-lg flex items-center justify-center text-[10px] text-slate-900 font-black cursor-se-resize touch-none";
+                    cornerHandle.innerHTML = "⤡";
 
                     imgBox.appendChild(imgElement);
+                    imgBox.appendChild(cornerHandle);
                     wrapper.appendChild(toolbar);
                     wrapper.appendChild(imgBox);
                     container.appendChild(wrapper);
                     activeImageWrapper = wrapper;
 
-                    // تحديث مظهر الصورة (حجم ودوران)
-                    function refreshImgTransform() {
+                    function updateImgBoxSize() {
                         imgBox.style.width = currentImgWidth + "px";
                         imgBox.style.height = currentImgHeight + "px";
                         imgBox.style.transform = `rotate(${currentImgRotation}deg)`;
                     }
 
-                    // أزرار الحجم
-                    toolbar.querySelector("#btnImgZoomIn").onclick = (ev) => {
+                    // التحكم بالعرض
+                    toolbar.querySelector("#btnWPlus").onclick = (ev) => {
                         ev.stopPropagation();
-                        if (currentImgWidth < 380) {
-                            currentImgWidth *= 1.12;
-                            currentImgHeight *= 1.12;
-                            refreshImgTransform();
-                        }
+                        currentImgWidth = Math.min(currentImgWidth + 12, 440);
+                        updateImgBoxSize();
                     };
-                    toolbar.querySelector("#btnImgZoomOut").onclick = (ev) => {
+                    toolbar.querySelector("#btnWMinus").onclick = (ev) => {
                         ev.stopPropagation();
-                        if (currentImgWidth > 30) {
-                            currentImgWidth *= 0.88;
-                            currentImgHeight *= 0.88;
-                            refreshImgTransform();
-                        }
+                        currentImgWidth = Math.max(currentImgWidth - 12, 30);
+                        updateImgBoxSize();
                     };
 
-                    // أزرار الدوران
-                    toolbar.querySelector("#btnImgRotLeft").onclick = (ev) => {
+                    // التحكم بالطول (الارتفاع) لتعبئة الإطار بالكامل
+                    toolbar.querySelector("#btnHPlus").onclick = (ev) => {
                         ev.stopPropagation();
-                        currentImgRotation = (currentImgRotation - 15 + 360) % 360;
-                        refreshImgTransform();
+                        currentImgHeight = Math.min(currentImgHeight + 12, 440);
+                        updateImgBoxSize();
                     };
+                    toolbar.querySelector("#btnHMinus").onclick = (ev) => {
+                        ev.stopPropagation();
+                        currentImgHeight = Math.max(currentImgHeight - 12, 30);
+                        updateImgBoxSize();
+                    };
+
+                    // الدوران
                     toolbar.querySelector("#btnImgRotRight").onclick = (ev) => {
                         ev.stopPropagation();
                         currentImgRotation = (currentImgRotation + 15) % 360;
-                        refreshImgTransform();
+                        updateImgBoxSize();
                     };
 
-                    // زر الإلغاء
+                    // تثبيت وإلغاء
                     toolbar.querySelector("#btnImgCancel").onclick = (ev) => {
                         ev.stopPropagation();
                         removeActiveFloatingImage();
                     };
-
-                    // زر التثبيت
                     toolbar.querySelector("#btnImgConfirm").onclick = (ev) => {
                         ev.stopPropagation();
                         bakeImageToCanvas(imgBox);
                     };
 
-                    // حركة السحب باللمس للجوال والماوس
+                    // مقبض الزاوية للسحب المباشر بالإصبع
+                    let resizing = false;
+                    let rStartX = 0, rStartY = 0;
+                    let rStartW = 0, rStartH = 0;
+
+                    function startResize(cx, cy) {
+                        resizing = true;
+                        rStartX = cx;
+                        rStartY = cy;
+                        rStartW = currentImgWidth;
+                        rStartH = currentImgHeight;
+                    }
+
+                    cornerHandle.addEventListener("touchstart", (ev) => {
+                        ev.stopPropagation();
+                        const t = ev.touches[0];
+                        startResize(t.clientX, t.clientY);
+                    }, { passive: false });
+
+                    cornerHandle.addEventListener("mousedown", (ev) => {
+                        ev.stopPropagation();
+                        startResize(ev.clientX, ev.clientY);
+                    });
+
+                    // حركة سحب الصورة ككل
                     let isDragging = false;
                     let startX = 0, startY = 0;
                     let initialLeft = 0, initialTop = 0;
@@ -1820,40 +1848,49 @@
                         startY = clientY;
                     }
 
-                    function doDrag(clientX, clientY) {
-                        if (!isDragging) return;
-                        const dx = clientX - startX;
-                        const dy = clientY - startY;
-                        wrapper.style.left = (initialLeft + dx) + "px";
-                        wrapper.style.top = (initialTop + dy) + "px";
-                    }
-
-                    function endDrag() {
-                        isDragging = false;
-                    }
-
                     imgBox.addEventListener("touchstart", (ev) => {
+                        if (resizing) return;
                         const t = ev.touches[0];
                         startDrag(t.clientX, t.clientY);
                     }, { passive: true });
 
+                    imgBox.addEventListener("mousedown", (ev) => {
+                        if (resizing) return;
+                        startDrag(ev.clientX, ev.clientY);
+                    });
+
                     window.addEventListener("touchmove", (ev) => {
-                        if (isDragging && ev.touches.length > 0) {
-                            doDrag(ev.touches[0].clientX, ev.touches[0].clientY);
+                        if (resizing && ev.touches.length > 0) {
+                            const t = ev.touches[0];
+                            const dx = t.clientX - rStartX;
+                            const dy = t.clientY - rStartY;
+                            currentImgWidth = Math.max(30, rStartW - dx);
+                            currentImgHeight = Math.max(30, rStartH + dy);
+                            updateImgBoxSize();
+                        } else if (isDragging && ev.touches.length > 0) {
+                            const t = ev.touches[0];
+                            wrapper.style.left = (initialLeft + (t.clientX - startX)) + "px";
+                            wrapper.style.top = (initialTop + (t.clientY - startY)) + "px";
                         }
                     }, { passive: true });
 
-                    window.addEventListener("touchend", endDrag);
-
-                    imgBox.addEventListener("mousedown", (ev) => {
-                        startDrag(ev.clientX, ev.clientY);
-                    });
                     window.addEventListener("mousemove", (ev) => {
-                        if (isDragging) doDrag(ev.clientX, ev.clientY);
+                        if (resizing) {
+                            const dx = ev.clientX - rStartX;
+                            const dy = ev.clientY - rStartY;
+                            currentImgWidth = Math.max(30, rStartW - dx);
+                            currentImgHeight = Math.max(30, rStartH + dy);
+                            updateImgBoxSize();
+                        } else if (isDragging) {
+                            wrapper.style.left = (initialLeft + (ev.clientX - startX)) + "px";
+                            wrapper.style.top = (initialTop + (ev.clientY - startY)) + "px";
+                        }
                     });
-                    window.addEventListener("mouseup", endDrag);
 
-                    showToast("اسحب الصورة داخل الإطار، تحكّم بحجمها ودورانها ثم اضغط تثبيت!", "image");
+                    window.addEventListener("touchend", () => { isDragging = false; resizing = false; });
+                    window.addEventListener("mouseup", () => { isDragging = false; resizing = false; });
+
+                    showToast("استخدم ↕️ لتطويل الصورة و ↔️ لعرضها لتطابق الإطار!", "image");
                 };
                 img.src = e.target.result;
             };
