@@ -405,6 +405,23 @@
                         </button>
                     </div>
 
+                    
+                    <!-- زر دبلجة وتسجيل مباشر لباسم ورندا -->
+                    <div id="dubInlineBox" class="flex items-center gap-1">
+                        <button id="btnDirectDub" onclick="toggleDirectDub()" class="px-2.5 py-1.5 bg-gradient-to-r from-rose-500 to-pink-600 hover:opacity-90 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-md shadow-rose-500/30 transition">
+                            <span id="dubDot" class="w-2 h-2 rounded-full bg-white inline-block"></span>
+                            <span id="dubText">سجّل 🎙️</span>
+                        </button>
+                        <button id="btnDubPlay" onclick="playDirectDubPreview()" class="hidden px-2 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-xl text-xs font-black items-center gap-1 transition" title="معاينة الصوت مع الكرتون">
+                            <i class="fa-solid fa-play text-[10px]"></i>
+                            <span>معاينة</span>
+                        </button>
+                        <button id="btnDubShare" onclick="shareDirectDubWhatsApp()" class="hidden px-2 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl text-xs font-black items-center gap-1 transition" title="مشاركة لواتساب">
+                            <i class="fa-brands fa-whatsapp text-xs"></i>
+                            <span>واتساب</span>
+                        </button>
+                    </div>
+
                     <!-- FPS Speed control -->
                     <div class="flex items-center gap-1.5 bg-studio-950 px-2.5 py-1 rounded-xl border border-slate-800 text-xs text-slate-400">
                         <span class="font-bold text-[11px] text-slate-300"><span id="fpsNum">6</span> FPS</span>
@@ -1938,300 +1955,175 @@
 
     </script>
 
-<div style="position:fixed; bottom:12px; left:12px; z-index:999;"><button id="openAudioBtn" onclick="openAudioModal()" class="audio-btn" style="padding: 6px 14px; border:none; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:6px;">🎙️ دبلجة وأصوات</button></div>
-
-
-<style>
-/* زر الصوت في شريط التحريك */
-.audio-btn {
-  background: linear-gradient(135deg, #ec4899, #8b5cf6) !important;
-  color: white !important;
-  font-weight: bold;
-  border-radius: 9999px !important;
-  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4);
-  transition: all 0.2s ease;
-}
-.audio-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(236, 72, 153, 0.6);
-}
-/* نافذة استوديو الصوت */
-#audioStudioModal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(8px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 99999;
-  padding: 16px;
-}
-.audio-box {
-  background: #18181b;
-  border: 1px solid #3f3f46;
-  border-radius: 20px;
-  max-width: 440px;
-  width: 100%;
-  padding: 24px;
-  color: #fff;
-  direction: rtl;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.7);
-}
-.sfx-btn {
-  background: #27272a;
-  border: 1px solid #3f3f46;
-  color: #e4e4e7;
-  padding: 10px;
-  border-radius: 12px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.sfx-btn:active {
-  transform: scale(0.95);
-  background: #3b82f6;
-  color: white;
-}
-</style>
-
-
-<!-- استوديو صوت ودبلجة باسم ورندا -->
-<div id="audioStudioModal">
-  <div class="audio-box">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-      <h3 style="margin:0; font-size:18px; display:flex; align-items:center; gap:8px;">
-        🎙️ <span>استوديو دبلجة باسم ورندا</span>
-      </h3>
-      <button onclick="closeAudioModal()" style="background:none; border:none; color:#a1a1aa; font-size:22px; cursor:pointer;">✕</button>
-    </div>
-
-    <!-- قسم تسجيل الصوت المباشر -->
-    <div style="background:#27272a; border-radius:14px; padding:16px; margin-bottom:16px; text-align:center;">
-      <div id="recordStatus" style="font-size:14px; margin-bottom:12px; color:#a1a1aa;">جاهز لتسجيل أصوات الشخصيات!</div>
-      <div style="display:flex; justify-content:center; gap:10px;">
-        <button id="startRecBtn" onclick="toggleVoiceRecord()" style="background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:12px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:6px;">
-          <span>🔴</span> <span id="recBtnText">بدء التسجيل</span>
-        </button>
-        <button id="playRecBtn" onclick="playRecordedAudio()" style="background:#3b82f6; color:white; border:none; padding:10px 16px; border-radius:12px; font-weight:bold; cursor:pointer; display:none;">
-          ▶️ تشغيل الصوت
-        </button>
-        <button id="delRecBtn" onclick="deleteRecordedAudio()" style="background:#71717a; color:white; border:none; padding:10px 12px; border-radius:12px; cursor:pointer; display:none;" title="حذف">
-          🗑️
-        </button>
-      </div>
-    </div>
-
-    <!-- مؤثرات صوتية كرتونية فورية -->
-    <div style="margin-bottom:20px;">
-      <div style="font-size:13px; color:#d4d4d8; margin-bottom:8px; font-weight:600;">⚡ مؤثرات كرتونية سريعة:</div>
-      <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">
-        <button class="sfx-btn" onclick="playSFX('boing')">🦘 قفزة بطل (Boing)</button>
-        <button class="sfx-btn" onclick="playSFX('laser')">⚡ ليزر خارق</button>
-        <button class="sfx-btn" onclick="playSFX('punch')">💥 ضربة نينجا</button>
-        <button class="sfx-btn" onclick="playSFX('cheer')">🎉 نغمة الفوز</button>
-      </div>
-    </div>
-
-    <!-- خيارات التصدير مع الصوت -->
-    <div style="display:flex; flex-direction:column; gap:8px;">
-      <button onclick="exportVideoWithAudio()" style="background:linear-gradient(135deg, #10b981, #059669); color:white; border:none; padding:12px; border-radius:12px; font-weight:bold; cursor:pointer; font-size:14px;">
-        🎬 تصدير فيديو ناطق مع الصوت (للواتساب)
-      </button>
-      <button onclick="closeAudioModal()" style="background:#3f3f46; color:#fff; border:none; padding:10px; border-radius:12px; font-size:13px; cursor:pointer;">
-        تم ورجوع للرسم
-      </button>
-    </div>
-  </div>
-</div>
-
-
 <script>
-// محرك الصوت المطور لباسم ورندا
-let audioContext = null;
-let mediaRecorder = null;
-let audioChunks = [];
-let recordedAudioBlob = null;
-let recordedAudioElement = new Audio();
-let isRecordingVoice = false;
+let directMediaRecorder = null;
+let directAudioChunks = [];
+let directAudioBlob = null;
+let directAudioPlayer = new Audio();
+let isDubbingActive = false;
 
-function getAudioContext() {
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  if (audioContext.state === 'suspended') {
-    audioContext.resume();
-  }
-  return audioContext;
-}
+async function toggleDirectDub() {
+    const btn = document.getElementById('btnDirectDub');
+    const txt = document.getElementById('dubText');
+    const dot = document.getElementById('dubDot');
+    const previewBtn = document.getElementById('btnDubPlay');
+    const shareBtn = document.getElementById('btnDubShare');
 
-// فتح وإغلاق النافذة
-function openAudioModal() {
-  document.getElementById('audioStudioModal').style.display = 'flex';
-  getAudioContext();
-}
-function closeAudioModal() {
-  document.getElementById('audioStudioModal').style.display = 'none';
-}
-
-// 1. مؤثرات كرتونية مولدة بالترددات بدون إنترنت
-function playSFX(type) {
-  const ctx = getAudioContext();
-  const now = ctx.currentTime;
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-
-  if (type === 'boing') {
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(150, now);
-    osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
-    osc.frequency.exponentialRampToValueAtTime(200, now + 0.35);
-    gain.gain.setValueAtTime(0.5, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
-    osc.start(now);
-    osc.stop(now + 0.35);
-  } else if (type === 'laser') {
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(900, now);
-    osc.frequency.exponentialRampToValueAtTime(80, now + 0.2);
-    gain.gain.setValueAtTime(0.4, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-    osc.start(now);
-    osc.stop(now + 0.2);
-  } else if (type === 'punch') {
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(250, now);
-    osc.frequency.exponentialRampToValueAtTime(40, now + 0.18);
-    gain.gain.setValueAtTime(0.6, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
-    osc.start(now);
-    osc.stop(now + 0.18);
-  } else if (type === 'cheer') {
-    const notes = [261.63, 329.63, 392.00, 523.25];
-    notes.forEach((freq, idx) => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.connect(g);
-      g.connect(ctx.destination);
-      o.type = 'sine';
-      o.frequency.setValueAtTime(freq, now + idx * 0.08);
-      g.gain.setValueAtTime(0.3, now + idx * 0.08);
-      g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.2);
-      o.start(now + idx * 0.08);
-      o.stop(now + idx * 0.08 + 0.2);
-    });
-  }
-}
-
-// 2. تسجيل صوت باسم ورندا
-async function toggleVoiceRecord() {
-  const statusEl = document.getElementById('recordStatus');
-  const btnText = document.getElementById('recBtnText');
-  const startBtn = document.getElementById('startRecBtn');
-
-  if (!isRecordingVoice) {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioChunks = [];
-      mediaRecorder = new MediaRecorder(stream);
-      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-      mediaRecorder.onstop = () => {
-        recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-        recordedAudioElement.src = URL.createObjectURL(recordedAudioBlob);
-        document.getElementById('playRecBtn').style.display = 'inline-flex';
-        document.getElementById('delRecBtn').style.display = 'inline-flex';
-        statusEl.innerHTML = "✅ تم حفظ الصوت بنجاح! سيتم تشغيله مع الأنميشن.";
-      };
-      mediaRecorder.start();
-      isRecordingVoice = true;
-      btnText.innerText = "إيقاف التسجيل ⏹️";
-      startBtn.style.background = "#f59e0b";
-      statusEl.innerHTML = "🔴 جارٍ التسجيل... تكلم يا بطل!";
-    } catch (err) {
-      alert("يرجى إعطاء الإذن للمتصفح لاستخدام الميكروفون.");
-    }
-  } else {
-    mediaRecorder.stop();
-    isRecordingVoice = false;
-    btnText.innerText = "تسجيل جديد 🔴";
-    startBtn.style.background = "#ef4444";
-  }
-}
-
-function playRecordedAudio() {
-  if (recordedAudioElement.src) {
-    recordedAudioElement.currentTime = 0;
-    recordedAudioElement.play();
-  }
-}
-
-function deleteRecordedAudio() {
-  recordedAudioBlob = null;
-  recordedAudioElement.src = "";
-  document.getElementById('playRecBtn').style.display = 'none';
-  document.getElementById('delRecBtn').style.display = 'none';
-  document.getElementById('recordStatus').innerText = "تم حذف الصوت، يمكنك التسجيل من جديد.";
-}
-
-// ربط تشغيل الصوت تلقائياً مع زر تشغيل الأنميشن
-document.addEventListener("DOMContentLoaded", () => {
-  const checkPlay = setInterval(() => {
-    const playBtn = document.getElementById('playBtn') || document.querySelector('[onclick*="play"]');
-    if (playBtn) {
-      playBtn.addEventListener('click', () => {
-        if (recordedAudioBlob && recordedAudioElement.src) {
-          recordedAudioElement.currentTime = 0;
-          recordedAudioElement.play().catch(()=>{});
+    if (!isDubbingActive) {
+        if (!frames || frames.length === 0) {
+            showToast("ارسم فريمات أولاً لتدبلج عليها يا بطل!", "palette");
+            return;
         }
-      });
-      clearInterval(checkPlay);
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            directAudioChunks = [];
+            directMediaRecorder = new MediaRecorder(stream);
+            directMediaRecorder.ondataavailable = e => { if (e.data.size > 0) directAudioChunks.push(e.data); };
+            
+            directMediaRecorder.onstop = () => {
+                directAudioBlob = new Blob(directAudioChunks, { type: 'audio/webm' });
+                directAudioPlayer.src = URL.createObjectURL(directAudioBlob);
+                previewBtn.classList.remove('hidden');
+                previewBtn.classList.add('inline-flex');
+                shareBtn.classList.remove('hidden');
+                shareBtn.classList.add('inline-flex');
+                showToast("✅ تم حفظ صوتك! اضغط معاينة أو واتساب", "check");
+                stopPlayback();
+            };
+
+            directMediaRecorder.start();
+            isDubbingActive = true;
+            txt.innerText = "إنهاء ⏹️";
+            btn.className = "px-2.5 py-1.5 bg-rose-600 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 animate-pulse shadow-lg transition";
+            dot.className = "w-2 h-2 rounded-full bg-yellow-300 inline-block";
+
+            // تشغيل حركة الكرتون فوراً ليدبلجوا وهم يشاهدون الشخصية
+            if (!isPlaying) startPlayback();
+            showToast("🔴 جارٍ الحركة والتسجيل... تكلّم الآن!", "microphone");
+
+        } catch(err) {
+            alert("يرجى إعطاء المتصفح صلاحية استخدام الميكروفون.");
+        }
+    } else {
+        if (directMediaRecorder && directMediaRecorder.state !== 'inactive') {
+            directMediaRecorder.stop();
+        }
+        isDubbingActive = false;
+        txt.innerText = "إعادة 🎙️";
+        btn.className = "px-2.5 py-1.5 bg-gradient-to-r from-rose-500 to-pink-600 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow transition";
+        dot.className = "w-2 h-2 rounded-full bg-white inline-block";
     }
-  }, 500);
-});
+}
 
-// 3. تصدير فيديو ناطق مع الصوت (Canvas + Audio to WebM)
-async function exportVideoWithAudio() {
-  const canvas = document.getElementById('drawingCanvas') || document.querySelector('canvas');
-  if (!canvas) {
-    alert("لم يتم العثور على لوحة الرسم!");
-    return;
-  }
-  alert("جارٍ تجهيز الفيديو الناطق... انتظر ثوانٍ قليلة.");
-  
-  const stream = canvas.captureStream(12);
-  if (recordedAudioBlob) {
-    const audioCtx = getAudioContext();
-    const response = await fetch(URL.createObjectURL(recordedAudioBlob));
-    const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-    const dest = audioCtx.createMediaStreamDestination();
-    const source = audioCtx.createBufferSource();
-    source.buffer = audioBuffer;
-    source.connect(dest);
-    source.start();
-    stream.addTrack(dest.stream.getAudioTracks()[0]);
-  }
+function playDirectDubPreview() {
+    if (directAudioPlayer.src) {
+        directAudioPlayer.currentTime = 0;
+        directAudioPlayer.play();
+        if (!isPlaying) startPlayback();
+        directAudioPlayer.onended = () => {
+            stopPlayback();
+        };
+    }
+}
 
-  const rec = new MediaRecorder(stream, { mimeType: 'video/webm' });
-  const chunks = [];
-  rec.ondataavailable = e => chunks.push(e.data);
-  rec.onstop = () => {
-    const blob = new Blob(chunks, { type: 'video/webm' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `باسم_أنميشن_${Date.now()}.webm`;
-    a.click();
-    closeAudioModal();
-  };
+async function shareDirectDubWhatsApp() {
+    showToast("⏳ بنجهز الفيديو بالصوت للمشاركة...", "film");
 
-  rec.start();
-  // تسجيل مدة 4 ثواني للمشهد
-  setTimeout(() => rec.stop(), 4000);
+    const canvas = document.getElementById('paintCanvas');
+    if (!canvas) return;
+
+    const expCanvas = document.createElement('canvas');
+    expCanvas.width = canvas.width || 480;
+    expCanvas.height = canvas.height || 480;
+    const ctx = expCanvas.getContext('2d');
+    const stream = expCanvas.captureStream(30);
+
+    let duration = 3.5;
+    if (directAudioBlob) {
+        try {
+            const actx = new (window.AudioContext || window.webkitAudioContext)();
+            const ab = await (await fetch(URL.createObjectURL(directAudioBlob))).arrayBuffer();
+            const buf = await actx.decodeAudioData(ab);
+            duration = Math.max(buf.duration, 2.5);
+            const dest = actx.createMediaStreamDestination();
+            const src = actx.createBufferSource();
+            src.buffer = buf;
+            src.connect(dest);
+            src.start(0);
+            const track = dest.stream.getAudioTracks()[0];
+            if (track) stream.addTrack(track);
+        } catch(e){}
+    }
+
+    let mimeType = 'video/webm';
+    if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')) mimeType = 'video/mp4;codecs=avc1';
+    else if (MediaRecorder.isTypeSupported('video/mp4')) mimeType = 'video/mp4';
+
+    const rec = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 2500000 });
+    const chunks = [];
+    rec.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+
+    rec.onstop = async () => {
+        const blob = new Blob(chunks, { type: mimeType });
+        const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+        const file = new File([blob], `أنميشن_باسم_ورندا.${ext}`, { type: mimeType });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({
+                    files: [file],
+                    title: 'أنميشن باسم ورندا 🎬',
+                    text: 'شوفوا فيلم الكرتون الجديد مع الدبلجة!'
+                });
+                showToast("✅ تمت المشاركة في واتساب!", "check");
+                return;
+            } catch(e){}
+        }
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `أنميشن_باسم_ورندا.${ext}`;
+        a.click();
+        showToast("✅ تم حفظ الفيديو بالهاتف!", "check");
+    };
+
+    rec.start();
+
+    const imgs = [];
+    for (const f of frames) {
+        const s = typeof f === 'string' ? f : (f.dataUrl || f.image || null);
+        if (s) {
+            const img = new Image();
+            img.src = s;
+            await new Promise(r => { img.onload = r; img.onerror = r; });
+            imgs.push(img);
+        }
+    }
+
+    const currentFpsVal = (typeof fps !== 'undefined') ? fps : 6;
+    const startTime = performance.now();
+    const totalMs = duration * 1000;
+    const frameIntervalMs = 1000 / currentFpsVal;
+
+    const timer = setInterval(() => {
+        const elapsed = performance.now() - startTime;
+        if (elapsed >= totalMs) {
+            clearInterval(timer);
+            rec.stop();
+            return;
+        }
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, expCanvas.width, expCanvas.height);
+        if (imgs.length > 0) {
+            const idx = Math.floor(elapsed / frameIntervalMs) % imgs.length;
+            ctx.drawImage(imgs[idx], 0, 0, expCanvas.width, expCanvas.height);
+        } else {
+            ctx.drawImage(canvas, 0, 0, expCanvas.width, expCanvas.height);
+        }
+    }, 1000 / 30);
 }
 </script>
-
 </body>
 </html>
